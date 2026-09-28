@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AutorController;
+use App\Http\Controllers\ExemplarController;
 use App\Http\Controllers\GeneroController;
 use App\Http\Controllers\LivroController;
 use Illuminate\Support\Facades\Route;
@@ -12,3 +13,6 @@ Route::apiResource('autores', AutorController::class)
 
 Route::apiResource('generos', GeneroController::class)
     ->parameters(['generos' => 'genero']);
+
+Route::apiResource('exemplares', ExemplarController::class)
+    ->parameters(['exemplares' => 'exemplar']);
