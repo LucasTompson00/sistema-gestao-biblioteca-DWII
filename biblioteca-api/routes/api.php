@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AutorController;
+use App\Http\Controllers\EmprestimoController;
 use App\Http\Controllers\ExemplarController;
 use App\Http\Controllers\GeneroController;
 use App\Http\Controllers\LivroController;
@@ -16,3 +17,6 @@ Route::apiResource('generos', GeneroController::class)
 
 Route::apiResource('exemplares', ExemplarController::class)
     ->parameters(['exemplares' => 'exemplar']);
+
+Route::apiResource('emprestimos', EmprestimoController::class)
+    ->parameters(['emprestimos' => 'emprestimo']);
