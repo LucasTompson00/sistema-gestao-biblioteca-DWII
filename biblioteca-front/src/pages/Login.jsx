@@ -1,30 +1,140 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import "./Login.css"
 
+const API_URL = "http://localhost:8000"
+
 function Login() {
+    const navigate = useNavigate()
+
     const [isRegister, setIsRegister] = useState(false)
-    const [isAnimating, setIsAnimating] = useState(false)
 
-    const handleSwitch = () => {
-        if (isAnimating) return
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
 
-        setIsAnimating(true)
+    const [error, setError] = useState("")
+    const [message, setMessage] = useState("")
+    const [loading, setLoading] = useState(false)
 
-        setTimeout(() => {
-            setIsRegister((current) => !current)
-        }, 400)
+    async function getCsrfToken() {
+        const response = await fetch(`${API_URL}/csrf-token`, {
+            credentials: "include",
+        })
 
-        setTimeout(() => {
-            setIsAnimating(false)
-        }, 800)
+        if (!response.ok) {
+            throw new Error("Não foi possível obter o token de segurança.")
+        }
+
+        const data = await response.json()
+
+        return data.token
+    }
+
+    async function handleLogin() {
+        const token = await getCsrfToken()
+
+        const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-CSRF-TOKEN": token,
+            },
+            body: JSON.stringify({
+                email,
+                senha: password,
+            }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Não foi possível realizar o login."
+            )
+        }
+
+        return data
+    }
+
+    async function handleRegister() {
+        const token = await getCsrfToken()
+
+        const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-CSRF-TOKEN": token,
+            },
+            body: JSON.stringify({
+                nome: name,
+                email,
+                senha: password,
+                senha_confirmation: confirmPassword,
+            }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            if (response.status === 422 && data.errors) {
+                const primeiroErro = Object.values(data.errors)[0][0]
+                throw new Error(primeiroErro)
+            }
+
+            throw new Error(
+                data.message || "Não foi possível realizar o cadastro."
+            )
+        }
+
+        return data
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault()
+
+        setError("")
+        setMessage("")
+        setLoading(true)
+
+        try {
+            if (isRegister) {
+                await handleRegister()
+
+                setMessage(
+                    "Cadastro realizado com sucesso. Faça login para continuar."
+                )
+
+                setIsRegister(false)
+                setName("")
+                setPassword("")
+                setConfirmPassword("")
+            } else {
+                await handleLogin()
+                navigate("/")
+            }
+        } catch (error) {
+            setError(error.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    function handleSwitch() {
+        setIsRegister(!isRegister)
+        setError("")
+        setMessage("")
+        setPassword("")
+        setConfirmPassword("")
     }
 
     return (
-        <main
-            className={`login ${
-                isRegister ? "register-mode" : ""
-            } ${isAnimating ? "animating" : ""}`}
-        >
+        <main className={`login ${isRegister ? "register-mode" : ""}`}>
             <section className="login-container">
                 <div className="login-panel">
                     <div className="login-content">
@@ -40,7 +150,10 @@ function Login() {
                             </p>
                         </div>
 
-                        <form className="login-form">
+                        <form
+                            className="login-form"
+                            onSubmit={handleSubmit}
+                        >
                             {isRegister && (
                                 <div className="login-field">
                                     <label htmlFor="name">
@@ -52,6 +165,10 @@ function Login() {
                                         type="text"
                                         placeholder="Digite seu nome"
                                         autoComplete="name"
+                                        value={name}
+                                        onChange={(event) =>
+                                            setName(event.target.value)
+                                        }
                                     />
                                 </div>
                             )}
@@ -66,6 +183,10 @@ function Login() {
                                     type="email"
                                     placeholder="Digite seu e-mail"
                                     autoComplete="email"
+                                    value={email}
+                                    onChange={(event) =>
+                                        setEmail(event.target.value)
+                                    }
                                 />
                             </div>
 
@@ -83,6 +204,10 @@ function Login() {
                                             ? "new-password"
                                             : "current-password"
                                     }
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(event.target.value)
+                                    }
                                 />
                             </div>
 
@@ -97,17 +222,40 @@ function Login() {
                                         type="password"
                                         placeholder="Confirme sua senha"
                                         autoComplete="new-password"
+                                        value={confirmPassword}
+                                        onChange={(event) =>
+                                            setConfirmPassword(
+                                                event.target.value
+                                            )
+                                        }
                                     />
                                 </div>
+                            )}
+
+                            {error && (
+                                <p className="login-error">
+                                    {error}
+                                </p>
+                            )}
+
+                            {message && (
+                                <p className="login-message">
+                                    {message}
+                                </p>
                             )}
 
                             <button
                                 className="login-button"
                                 type="submit"
+                                disabled={loading}
                             >
-                                {isRegister
-                                    ? "Criar conta"
-                                    : "Entrar"}
+                                {loading
+                                    ? isRegister
+                                        ? "Criando..."
+                                        : "Entrando..."
+                                    : isRegister
+                                        ? "Criar conta"
+                                        : "Entrar"}
                             </button>
                         </form>
 
@@ -115,7 +263,6 @@ function Login() {
                             className="login-switch"
                             type="button"
                             onClick={handleSwitch}
-                            disabled={isAnimating}
                         >
                             {isRegister
                                 ? "Já tenho uma conta"
