@@ -143,7 +143,7 @@ function Login() {
 
     return (
         <main className="book-page">
-            {/* Cabeçalho superior decorativo */}
+            {}
             <header className="book-top-bar">
                 <span className="book-top-tag">
                     SISTEMA BIBLIOTECÁRIO
@@ -159,7 +159,7 @@ function Login() {
             </header>
 
             <section className="book-stage">
-                {/* Livro: alterna entre capa de login e verso de cadastro */}
+                {}
                 <article
                     className={`book-volume ${
                         isRegister
@@ -167,7 +167,7 @@ function Login() {
                             : "is-front-cover"
                     }`}
                 >
-                    {/* Fita Marcadora */}
+                    {}
                     <div
                         className="book-ribbon"
                         aria-hidden="true"
@@ -175,7 +175,7 @@ function Login() {
                         <span className="book-ribbon-tip"></span>
                     </div>
 
-                    {/* Lombada de encadernação */}
+                    {}
                     <div
                         className="book-spine"
                         aria-hidden="true"
@@ -185,7 +185,7 @@ function Login() {
                         <div className="book-spine-line"></div>
                     </div>
 
-                    {/* Moldura dourada interna */}
+                    {}
                     <div className="book-inner-border">
                         <div className="book-corner tl"></div>
                         <div className="book-corner tr"></div>
@@ -193,7 +193,7 @@ function Login() {
                         <div className="book-corner br"></div>
 
                         <div className="book-content">
-                            {/* Cabeçalho do livro */}
+                            {}
                             <div className="book-header">
                                 <span className="book-edition-label">
                                     {isRegister
@@ -214,12 +214,12 @@ function Login() {
                                 </p>
                             </div>
 
-                            {/* Formulário */}
+                            {}
                             <form
                                 className="book-form"
                                 onSubmit={handleSubmit}
                             >
-                                {/* Nome - somente no cadastro */}
+                                {}
                                 {isRegister && (
                                     <div className="book-field">
                                         <label htmlFor="name">
@@ -242,7 +242,7 @@ function Login() {
                                     </div>
                                 )}
 
-                                {/* E-mail */}
+                                {}
                                 <div className="book-field">
                                     <label htmlFor="email">
                                         E-mail Cadastrado
@@ -263,7 +263,7 @@ function Login() {
                                     />
                                 </div>
 
-                                {/* Senha */}
+                                {}
                                 <div className="book-field">
                                     <label htmlFor="password">
                                         Palavra-Chave / Senha
@@ -307,7 +307,7 @@ function Login() {
                                     </div>
                                 </div>
 
-                                {/* Confirmar senha - somente no cadastro */}
+                                {}
                                 {isRegister && (
                                     <div className="book-field">
                                         <label htmlFor="confirm-password">
@@ -349,21 +349,21 @@ function Login() {
                                     </div>
                                 )}
 
-                                {/* Mensagem de erro */}
+                                {}
                                 {error && (
                                     <p className="book-feedback book-error">
                                         {error}
                                     </p>
                                 )}
 
-                                {/* Mensagem de sucesso */}
+                                {}
                                 {message && (
                                     <p className="book-feedback book-success">
                                         {message}
                                     </p>
                                 )}
 
-                                {/* Botão de submissão */}
+                                {}
                                 <button
                                     className="book-submit-btn"
                                     type="submit"
@@ -379,7 +379,7 @@ function Login() {
                                 </button>
                             </form>
 
-                            {/* Código de barras no cadastro */}
+                            {}
                             {isRegister && (
                                 <div
                                     className="book-barcode-wrapper"
@@ -404,7 +404,7 @@ function Login() {
                                 </div>
                             )}
 
-                            {/* Alternador Login/Cadastro */}
+                            {}
                             <div className="book-footer-switch">
                                 <button
                                     type="button"
