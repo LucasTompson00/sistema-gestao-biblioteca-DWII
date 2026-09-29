@@ -14,6 +14,9 @@ function Login() {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
 
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(false)
@@ -114,6 +117,8 @@ function Login() {
                 setName("")
                 setPassword("")
                 setConfirmPassword("")
+                setShowPassword(false)
+                setShowConfirmPassword(false)
             } else {
                 await handleLogin()
                 navigate("/")
@@ -131,6 +136,8 @@ function Login() {
         setMessage("")
         setPassword("")
         setConfirmPassword("")
+        setShowPassword(false)
+        setShowConfirmPassword(false)
     }
 
     return (
@@ -195,20 +202,37 @@ function Login() {
                                     Senha
                                 </label>
 
-                                <input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Digite sua senha"
-                                    autoComplete={
-                                        isRegister
-                                            ? "new-password"
-                                            : "current-password"
-                                    }
-                                    value={password}
-                                    onChange={(event) =>
-                                        setPassword(event.target.value)
-                                    }
-                                />
+                                <div className="password-input">
+                                    <input
+                                        id="password"
+                                        type={
+                                            showPassword
+                                                ? "text"
+                                                : "password"
+                                        }
+                                        placeholder="Digite sua senha"
+                                        autoComplete={
+                                            isRegister
+                                                ? "new-password"
+                                                : "current-password"
+                                        }
+                                        value={password}
+                                        onChange={(event) =>
+                                            setPassword(event.target.value)
+                                        }
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                    >
+                                        {showPassword
+                                            ? "Ocultar"
+                                            : "Mostrar"}
+                                    </button>
+                                </div>
                             </div>
 
                             {isRegister && (
@@ -217,18 +241,37 @@ function Login() {
                                         Confirmar senha
                                     </label>
 
-                                    <input
-                                        id="confirm-password"
-                                        type="password"
-                                        placeholder="Confirme sua senha"
-                                        autoComplete="new-password"
-                                        value={confirmPassword}
-                                        onChange={(event) =>
-                                            setConfirmPassword(
-                                                event.target.value
-                                            )
-                                        }
-                                    />
+                                    <div className="password-input">
+                                        <input
+                                            id="confirm-password"
+                                            type={
+                                                showConfirmPassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            placeholder="Confirme sua senha"
+                                            autoComplete="new-password"
+                                            value={confirmPassword}
+                                            onChange={(event) =>
+                                                setConfirmPassword(
+                                                    event.target.value
+                                                )
+                                            }
+                                        />
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowConfirmPassword(
+                                                    !showConfirmPassword
+                                                )
+                                            }
+                                        >
+                                            {showConfirmPassword
+                                                ? "Ocultar"
+                                                : "Mostrar"}
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
