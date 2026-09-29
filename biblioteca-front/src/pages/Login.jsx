@@ -43,7 +43,7 @@ function Login() {
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json",
+                Accept: "application/json",
                 "X-CSRF-TOKEN": token,
             },
             body: JSON.stringify({
@@ -71,7 +71,7 @@ function Login() {
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json",
+                Accept: "application/json",
                 "X-CSRF-TOKEN": token,
             },
             body: JSON.stringify({
@@ -121,6 +121,7 @@ function Login() {
                 setShowConfirmPassword(false)
             } else {
                 await handleLogin()
+
                 navigate("/")
             }
         } catch (error) {
@@ -141,119 +142,151 @@ function Login() {
     }
 
     return (
-        <main className={`login ${isRegister ? "register-mode" : ""}`}>
-            <section className="login-container">
-                <div className="login-panel">
-                    <div className="login-content">
-                        <div className="login-header">
-                            <h1 className="login-title">
-                                {isRegister ? "Criar conta" : "Login"}
-                            </h1>
+        <main className="book-page">
+            {/* Cabeçalho superior decorativo */}
+            <header className="book-top-bar">
+                <span className="book-top-tag">
+                    SISTEMA BIBLIOTECÁRIO
+                </span>
 
-                            <p className="login-subtitle">
-                                {isRegister
-                                    ? "Crie sua conta para acessar a biblioteca"
-                                    : "Acesse sua conta"}
-                            </p>
-                        </div>
+                <span className="book-top-title">
+                    BIBLIOTECA VIRTUAL
+                </span>
 
-                        <form
-                            className="login-form"
-                            onSubmit={handleSubmit}
-                        >
-                            {isRegister && (
-                                <div className="login-field">
-                                    <label htmlFor="name">
-                                        Nome
+                <span className="book-top-sub">
+                    SALA DE ACERVO
+                </span>
+            </header>
+
+            <section className="book-stage">
+                {/* Livro: alterna entre capa de login e verso de cadastro */}
+                <article
+                    className={`book-volume ${
+                        isRegister
+                            ? "is-back-cover"
+                            : "is-front-cover"
+                    }`}
+                >
+                    {/* Fita Marcadora */}
+                    <div
+                        className="book-ribbon"
+                        aria-hidden="true"
+                    >
+                        <span className="book-ribbon-tip"></span>
+                    </div>
+
+                    {/* Lombada de encadernação */}
+                    <div
+                        className="book-spine"
+                        aria-hidden="true"
+                    >
+                        <div className="book-spine-line"></div>
+                        <div className="book-spine-line"></div>
+                        <div className="book-spine-line"></div>
+                    </div>
+
+                    {/* Moldura dourada interna */}
+                    <div className="book-inner-border">
+                        <div className="book-corner tl"></div>
+                        <div className="book-corner tr"></div>
+                        <div className="book-corner bl"></div>
+                        <div className="book-corner br"></div>
+
+                        <div className="book-content">
+                            {/* Cabeçalho do livro */}
+                            <div className="book-header">
+                                <span className="book-edition-label">
+                                    {isRegister
+                                        ? "✦ VERSO DO VOLUME · TOMO I ✦"
+                                        : "✦ REGISTRO OFICIAL · TOMO I ✦"}
+                                </span>
+
+                                <h1 className="book-title">
+                                    {isRegister
+                                        ? "Ficha de Registro"
+                                        : "Abra a Capa"}
+                                </h1>
+
+                                <p className="book-subtitle">
+                                    {isRegister
+                                        ? "Preencha seus dados para receber seu cartão de leitor"
+                                        : "Identifique-se para acessar o catálogo e acervo"}
+                                </p>
+                            </div>
+
+                            {/* Formulário */}
+                            <form
+                                className="book-form"
+                                onSubmit={handleSubmit}
+                            >
+                                {/* Nome - somente no cadastro */}
+                                {isRegister && (
+                                    <div className="book-field">
+                                        <label htmlFor="name">
+                                            Nome do Leitor / Autor
+                                        </label>
+
+                                        <input
+                                            id="name"
+                                            type="text"
+                                            placeholder="Seu nome completo"
+                                            autoComplete="name"
+                                            required
+                                            value={name}
+                                            onChange={(event) =>
+                                                setName(
+                                                    event.target.value
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                )}
+
+                                {/* E-mail */}
+                                <div className="book-field">
+                                    <label htmlFor="email">
+                                        E-mail Cadastrado
                                     </label>
 
                                     <input
-                                        id="name"
-                                        type="text"
-                                        placeholder="Digite seu nome"
-                                        autoComplete="name"
-                                        value={name}
+                                        id="email"
+                                        type="email"
+                                        placeholder="leitor@biblioteca.org"
+                                        autoComplete="email"
+                                        required
+                                        value={email}
                                         onChange={(event) =>
-                                            setName(event.target.value)
+                                            setEmail(
+                                                event.target.value
+                                            )
                                         }
                                     />
                                 </div>
-                            )}
 
-                            <div className="login-field">
-                                <label htmlFor="email">
-                                    E-mail
-                                </label>
-
-                                <input
-                                    id="email"
-                                    type="email"
-                                    placeholder="Digite seu e-mail"
-                                    autoComplete="email"
-                                    value={email}
-                                    onChange={(event) =>
-                                        setEmail(event.target.value)
-                                    }
-                                />
-                            </div>
-
-                            <div className="login-field">
-                                <label htmlFor="password">
-                                    Senha
-                                </label>
-
-                                <div className="password-input">
-                                    <input
-                                        id="password"
-                                        type={
-                                            showPassword
-                                                ? "text"
-                                                : "password"
-                                        }
-                                        placeholder="Digite sua senha"
-                                        autoComplete={
-                                            isRegister
-                                                ? "new-password"
-                                                : "current-password"
-                                        }
-                                        value={password}
-                                        onChange={(event) =>
-                                            setPassword(event.target.value)
-                                        }
-                                    />
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setShowPassword(!showPassword)
-                                        }
-                                    >
-                                        {showPassword
-                                            ? "Ocultar"
-                                            : "Mostrar"}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {isRegister && (
-                                <div className="login-field">
-                                    <label htmlFor="confirm-password">
-                                        Confirmar senha
+                                {/* Senha */}
+                                <div className="book-field">
+                                    <label htmlFor="password">
+                                        Palavra-Chave / Senha
                                     </label>
 
                                     <div className="password-input">
                                         <input
-                                            id="confirm-password"
+                                            id="password"
                                             type={
-                                                showConfirmPassword
+                                                showPassword
                                                     ? "text"
                                                     : "password"
                                             }
-                                            placeholder="Confirme sua senha"
-                                            autoComplete="new-password"
-                                            value={confirmPassword}
+                                            placeholder="••••••••"
+                                            autoComplete={
+                                                isRegister
+                                                    ? "new-password"
+                                                    : "current-password"
+                                            }
+                                            required
+                                            value={password}
                                             onChange={(event) =>
-                                                setConfirmPassword(
+                                                setPassword(
                                                     event.target.value
                                                 )
                                             }
@@ -262,73 +295,130 @@ function Login() {
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                setShowConfirmPassword(
-                                                    !showConfirmPassword
+                                                setShowPassword(
+                                                    !showPassword
                                                 )
                                             }
                                         >
-                                            {showConfirmPassword
+                                            {showPassword
                                                 ? "Ocultar"
                                                 : "Mostrar"}
                                         </button>
                                     </div>
                                 </div>
+
+                                {/* Confirmar senha - somente no cadastro */}
+                                {isRegister && (
+                                    <div className="book-field">
+                                        <label htmlFor="confirm-password">
+                                            Confirmar Palavra-Chave
+                                        </label>
+
+                                        <div className="password-input">
+                                            <input
+                                                id="confirm-password"
+                                                type={
+                                                    showConfirmPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
+                                                placeholder="••••••••"
+                                                autoComplete="new-password"
+                                                required
+                                                value={confirmPassword}
+                                                onChange={(event) =>
+                                                    setConfirmPassword(
+                                                        event.target.value
+                                                    )
+                                                }
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setShowConfirmPassword(
+                                                        !showConfirmPassword
+                                                    )
+                                                }
+                                            >
+                                                {showConfirmPassword
+                                                    ? "Ocultar"
+                                                    : "Mostrar"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Mensagem de erro */}
+                                {error && (
+                                    <p className="book-feedback book-error">
+                                        {error}
+                                    </p>
+                                )}
+
+                                {/* Mensagem de sucesso */}
+                                {message && (
+                                    <p className="book-feedback book-success">
+                                        {message}
+                                    </p>
+                                )}
+
+                                {/* Botão de submissão */}
+                                <button
+                                    className="book-submit-btn"
+                                    type="submit"
+                                    disabled={loading}
+                                >
+                                    {loading
+                                        ? isRegister
+                                            ? "Carimbando Cartão..."
+                                            : "Consultando Acervo..."
+                                        : isRegister
+                                            ? "Emitir Cartão de Leitor"
+                                            : "Entrar na Sala de Leitura"}
+                                </button>
+                            </form>
+
+                            {/* Código de barras no cadastro */}
+                            {isRegister && (
+                                <div
+                                    className="book-barcode-wrapper"
+                                    aria-hidden="true"
+                                >
+                                    <div className="book-barcode">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+
+                                    <span className="book-isbn">
+                                        ISBN 978-85-1924-DWII
+                                    </span>
+                                </div>
                             )}
 
-                            {error && (
-                                <p className="login-error">
-                                    {error}
-                                </p>
-                            )}
-
-                            {message && (
-                                <p className="login-message">
-                                    {message}
-                                </p>
-                            )}
-
-                            <button
-                                className="login-button"
-                                type="submit"
-                                disabled={loading}
-                            >
-                                {loading
-                                    ? isRegister
-                                        ? "Criando..."
-                                        : "Entrando..."
-                                    : isRegister
-                                        ? "Criar conta"
-                                        : "Entrar"}
-                            </button>
-                        </form>
-
-                        <button
-                            className="login-switch"
-                            type="button"
-                            onClick={handleSwitch}
-                        >
-                            {isRegister
-                                ? "Já tenho uma conta"
-                                : "Não tenho uma conta"}
-                        </button>
+                            {/* Alternador Login/Cadastro */}
+                            <div className="book-footer-switch">
+                                <button
+                                    type="button"
+                                    className="book-switch-btn"
+                                    onClick={handleSwitch}
+                                >
+                                    {isRegister
+                                        ? "← Já possui registro? Abra a capa e entre"
+                                        : "Não possui registro? Solicite um cartão de leitor →"}
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div className="login-decoration">
-                    <div className="login-decoration-content">
-                        <h2>
-                            {isRegister
-                                ? "Bem-vindo à biblioteca!"
-                                : "Bem-vindo de volta!"}
-                        </h2>
-
-                        <p>
-                            {isRegister
-                                ? "Crie sua conta para começar."
-                                : "Entre novamente para continuar."}
-                        </p>
-                    </div>
-                </div>
+                </article>
             </section>
         </main>
     )
