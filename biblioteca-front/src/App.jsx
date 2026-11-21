@@ -1,8 +1,8 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import "./App.css"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import ProtectedRoute from "./components/ProtectedRoute"
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return (
@@ -25,7 +25,7 @@ function App() {
                 />
             </Routes>
         </BrowserRouter>
-    )
+    );
 }
 
-export default App
+export default App;

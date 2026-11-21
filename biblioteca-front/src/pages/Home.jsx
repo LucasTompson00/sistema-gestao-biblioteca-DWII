@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
   Search,
   BookOpen,
-  Sparkles,
-  Clock3,
-  ShieldCheck,
+  ChevronRight,
+  ChevronLeft,
   LogOut,
 } from "lucide-react";
 import "./Home.css";
@@ -18,114 +17,140 @@ function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("Todos");
 
   const navigate = useNavigate();
 
-  async function getCsrfToken() {
-    const response = await fetch(`${API_URL}/csrf-token`, {
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      throw new Error("Não foi possível obter o token de segurança.");
-    }
-
-    const data = await response.json();
-    return data.token;
-  }
-
   async function handleLogout() {
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  try {
-    const csrfResponse = await fetch(`${API_URL}/csrf-token`, {
-      credentials: "include",
-    });
+    try {
+      const csrfResponse = await fetch(`${API_URL}/csrf-token`, {
+        credentials: "include",
+      });
 
-    const csrfData = await csrfResponse.json();
+      const csrfData = await csrfResponse.json();
 
-    const logoutResponse = await fetch(`${API_URL}/logout`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Accept": "application/json",
-        "X-CSRF-TOKEN": csrfData.token,
-      },
-    });
+      const logoutResponse = await fetch(`${API_URL}/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "X-CSRF-TOKEN": csrfData.token,
+        },
+      });
 
-    if (!logoutResponse.ok) {
-      throw new Error("Não foi possível sair da conta.");
+      if (!logoutResponse.ok) {
+        throw new Error("Não foi possível sair da conta.");
+      }
+
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/login", { replace: true });
-  } catch (error) {
-    console.error(error);
-    setError(error.message);
-  } finally {
-    setLoading(false);
   }
-}
 
   const categories = [
+    "Todos",
+    "Literatura Brasileira",
+    "Literatura Estrangeira",
+    "Romance",
+    "Filosofia",
+    "História",
+    "Tecnologia",
+    "Infantil",
+  ];
+
+  const books = [
     {
-      name: "Romance",
-      icon: BookOpen,
+      title: "Dom Casmurro",
+      isbn: "9788535914849",
+      year: "1899",
+      category: "Literatura Brasileira",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788535914849-L.jpg",
     },
     {
-      name: "Ficção",
-      icon: Sparkles,
+      title: "O Alienista",
+      isbn: "9788535902778",
+      year: "1882",
+      category: "Literatura Brasileira",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788535902778-L.jpg",
     },
     {
-      name: "História",
-      icon: BookOpen,
+      title: "Memórias Póstumas de Brás Cubas",
+      isbn: "9788535911671",
+      year: "1881",
+      category: "Literatura Brasileira",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788535911671-L.jpg",
     },
     {
-      name: "Tecnologia",
-      icon: BookOpen,
+      title: "A Arte da Guerra",
+      isbn: "9788572835977",
+      year: "2000",
+      category: "Filosofia",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788572835977-L.jpg",
+    },
+    {
+      title: "Alice no País das Maravilhas",
+      isbn: "9788535909050",
+      year: "1865",
+      category: "Literatura Estrangeira",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788535909050-L.jpg",
+    },
+    {
+      title: "A República",
+      isbn: "9788572835978",
+      year: "380 a.C.",
+      category: "Filosofia",
+      image:
+        "https://covers.openlibrary.org/b/isbn/9788572835978-L.jpg",
     },
   ];
 
-  const perks = [
-    {
-      title: "Acervo organizado",
-      description: "Encontre livros de forma rápida e simples.",
-      icon: BookOpen,
-    },
-    {
-      title: "Empréstimos fáceis",
-      description: "Acompanhe seus empréstimos em poucos cliques.",
-      icon: Clock3,
-    },
-    {
-      title: "Acesso seguro",
-      description: "Seus dados ficam protegidos durante o uso.",
-      icon: ShieldCheck,
-    },
-  ];
+  const filteredBooks = books.filter((book) => {
+    const matchesCategory =
+      category === "Todos" || book.category === category;
+
+    const searchText = search.toLowerCase().trim();
+
+    const matchesSearch =
+      !searchText ||
+      book.title.toLowerCase().includes(searchText) ||
+      book.isbn.toLowerCase().includes(searchText);
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="home-page">
       <header className="topbar">
-        <div className="logo">
-          <BookOpen size={28} />
+        <Link to="/" className="logo">
+          <BookOpen size={27} />
           <span>BiblioTech</span>
-        </div>
+        </Link>
 
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Buscar livros..."
-          />
-        </div>
+        <nav className="main-nav">
+          <Link to="/">Início</Link>
+          <Link to="/livros">Livros</Link>
+          <Link to="/emprestimos">Empréstimos</Link>
+        </nav>
 
         <button
           className="menu-button"
           type="button"
           onClick={() => setMenuOpen(true)}
         >
-          <Menu size={26} />
+          <Menu size={24} />
         </button>
       </header>
 
@@ -137,14 +162,30 @@ function Home() {
               type="button"
               onClick={() => setMenuOpen(false)}
             >
-              <X size={26} />
+              <X size={24} />
             </button>
 
+            <div className="drawer-logo">
+              <BookOpen size={24} />
+              <span>BiblioTech</span>
+            </div>
+
             <nav>
-              <Link to="/home">Início</Link>
-              <Link to="/livros">Livros</Link>
-              <Link to="/emprestimos">Empréstimos</Link>
-              <Link to="/perfil">Meu perfil</Link>
+              <Link to="/" onClick={() => setMenuOpen(false)}>
+                Início
+              </Link>
+
+              <Link to="/livros" onClick={() => setMenuOpen(false)}>
+                Livros
+              </Link>
+
+              <Link to="/emprestimos" onClick={() => setMenuOpen(false)}>
+                Empréstimos
+              </Link>
+
+              <Link to="/perfil" onClick={() => setMenuOpen(false)}>
+                Meu perfil
+              </Link>
             </nav>
 
             <button
@@ -153,7 +194,7 @@ function Home() {
               onClick={handleLogout}
               disabled={loading}
             >
-              <LogOut size={20} />
+              <LogOut size={18} />
               {loading ? "Saindo..." : "Sair"}
             </button>
 
@@ -165,122 +206,127 @@ function Home() {
       <main>
         <section className="hero">
           <div className="hero-content">
-            <span className="hero-tag">GESTÃO DE BIBLIOTECA</span>
+            <span className="hero-small-title">BIBLIOTECH</span>
 
-            <h1>
-              Seu universo de
-              <span> livros </span>
-              em um só lugar.
-            </h1>
+            <h1>Encontre seu próximo livro.</h1>
 
             <p>
-              Encontre, consulte e acompanhe seus livros e empréstimos
-              de forma simples e organizada.
+              Consulte o acervo da biblioteca, encontre títulos
+              e descubra novas leituras.
             </p>
 
-            <div className="hero-actions">
-              <Link to="/livros" className="primary-button">
-                Explorar livros
-              </Link>
+            <div className="hero-search">
+              <Search size={21} />
 
-              <Link to="/emprestimos" className="secondary-button">
-                Meus empréstimos
-              </Link>
+              <input
+                type="text"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Digite o título ou ISBN..."
+              />
+
+              <button type="button">Buscar</button>
             </div>
           </div>
         </section>
 
-        <section className="categories-section">
-          <div className="section-heading">
-            <span>CATEGORIAS</span>
-            <h2>Explore por categoria</h2>
-          </div>
+        <section className="catalog">
+          <div className="category-bar">
+            <span className="category-title">Categorias</span>
 
-          <div className="categories-grid">
-            {categories.map((category) => {
-              const Icon = category.icon;
-
-              return (
+            <div className="category-list">
+              {categories.map((item) => (
                 <button
-                  className="category-card"
                   type="button"
-                  key={category.name}
+                  key={item}
+                  className={category === item ? "selected" : ""}
+                  onClick={() => setCategory(item)}
                 >
-                  <Icon size={28} />
-                  <span>{category.name}</span>
+                  {item}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          <div className="section-title">
+            <div>
+              <span>ACERVO</span>
+              <h2>
+                {category === "Todos"
+                  ? "Livros em destaque"
+                  : category}
+              </h2>
+            </div>
+
+            <Link to="/livros">
+              Ver todos
+              <ChevronRight size={17} />
+            </Link>
+          </div>
+
+          <div className="books-area">
+            <button className="book-arrow left" type="button">
+              <ChevronLeft size={18} />
+            </button>
+
+            <div className="book-grid">
+              {filteredBooks.map((book) => (
+                <article className="book-card" key={book.isbn}>
+                  <div className="book-cover">
+                    <img
+                      src={book.image}
+                      alt={`Capa de ${book.title}`}
+                    />
+                  </div>
+
+                  <div className="book-data">
+                    <span>{book.category}</span>
+
+                    <h3>{book.title}</h3>
+
+                    <p>ISBN {book.isbn}</p>
+
+                    <small>{book.year}</small>
+                  </div>
+                </article>
+              ))}
+
+              {filteredBooks.length === 0 && (
+                <div className="empty-result">
+                  <BookOpen size={30} />
+                  <p>Nenhum livro encontrado.</p>
+                </div>
+              )}
+            </div>
+
+            <button className="book-arrow right" type="button">
+              <ChevronRight size={18} />
+            </button>
           </div>
         </section>
 
-        <section className="bestsellers-section">
-          <div className="section-heading">
-            <span>DESTAQUES</span>
-            <h2>Livros em destaque</h2>
+        <section className="library-strip">
+          <div>
+            <span>ACERVO BIBLIOTECH</span>
+            <h2>Uma biblioteca para descobrir.</h2>
           </div>
 
-          <div className="book-list">
-            <article className="book-card">
-              <div className="book-placeholder">
-                <BookOpen size={42} />
-              </div>
-
-              <div className="book-info">
-                <span>DESTAQUE</span>
-                <h3>Livro em destaque</h3>
-                <p>Consulte detalhes e disponibilidade no acervo.</p>
-              </div>
-            </article>
-
-            <article className="book-card">
-              <div className="book-placeholder">
-                <BookOpen size={42} />
-              </div>
-
-              <div className="book-info">
-                <span>MAIS LIDO</span>
-                <h3>Livro mais procurado</h3>
-                <p>Confira se este título está disponível.</p>
-              </div>
-            </article>
-
-            <article className="book-card">
-              <div className="book-placeholder">
-                <BookOpen size={42} />
-              </div>
-
-              <div className="book-info">
-                <span>NOVO</span>
-                <h3>Novidade no acervo</h3>
-                <p>Descubra os novos títulos disponíveis.</p>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section className="perks-section">
-          {perks.map((perk) => {
-            const Icon = perk.icon;
-
-            return (
-              <div className="perk-card" key={perk.title}>
-                <Icon size={30} />
-                <h3>{perk.title}</h3>
-                <p>{perk.description}</p>
-              </div>
-            );
-          })}
+          <Link to="/livros">
+            Explorar acervo
+            <ChevronRight size={17} />
+          </Link>
         </section>
       </main>
 
       <footer className="footer">
         <div className="logo">
-          <BookOpen size={24} />
+          <BookOpen size={21} />
           <span>BiblioTech</span>
         </div>
 
-        <p>© 2026 BiblioTech. Sistema de Gestão de Biblioteca.</p>
+        <p>
+          © 2026 BiblioTech. Sistema de Gestão de Biblioteca.
+        </p>
       </footer>
     </div>
   );
