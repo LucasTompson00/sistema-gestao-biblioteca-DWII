@@ -1,33 +1,18 @@
-import { useEffect, useState } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 function ProtectedRoute({ children }) {
-    const [authenticated, setAuthenticated] = useState(null)
+  const { usuario, carregando } = useAuth();
 
-    useEffect(() => {
-        fetch("http://localhost:8000/me", {
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-            },
-        })
-            .then((response) => {
-                setAuthenticated(response.ok)
-            })
-            .catch(() => {
-                setAuthenticated(false)
-            })
-    }, [])
+  if (carregando) {
+    return <p>Verificando autenticação...</p>;
+  }
 
-    if (authenticated === null) {
-        return <p>Verificando sessão...</p>
-    }
+  if (!usuario) {
+    return <Navigate to="/login" replace />;
+  }
 
-    if (!authenticated) {
-        return <Navigate to="/login" replace />
-    }
-
-    return children
+  return children;
 }
 
-export default ProtectedRoute
+export default ProtectedRoute;

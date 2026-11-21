@@ -1,0 +1,22 @@
+@baseUrl = http://127.0.0.1:8000/api/v1
+@token = 2|A782kVYxFtzPua2Suz7b54K0QNYTg4LkBxlfGvyvf8666b0d
+
+### Login
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "guiAura@gmail.com",
+    "password": "12345678"
+}
+
+### Consultar usuário autenticado
+GET {{baseUrl}}/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Logout
+POST {{baseUrl}}/logout
+Authorization: Bearer {{token}}
+Accept: application/json
