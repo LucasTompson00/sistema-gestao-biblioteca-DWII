@@ -1,8 +1,9 @@
+
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import "./App.css"
 import Home from "./pages/Home"
 import Login from "./pages/Login"
-import ProtectedRoute from "./components/ProtectedRoute"
+import CadastroLivro from "./pages/CadastroLivro"
 
 function App() {
     return (
@@ -10,14 +11,10 @@ function App() {
             <Routes>
                 <Route path="/login" element={<Login />} />
 
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <Home />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route path="/cadastro-livro" element={<CadastroLivro />} />
+
+                {/* Acesso temporário sem autenticação */}
+                <Route path="/" element={<Home />} />
 
                 <Route
                     path="*"
