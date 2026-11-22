@@ -1424,3 +1424,104 @@
     width: 100%;
   }
 }
+
+.exemplar-status {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 7px;
+  padding: 4px 9px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  background: rgba(208, 170, 87, 0.12);
+  color: #d0aa57;
+}
+
+.exemplar-status.disponivel {
+  background: rgba(76, 140, 80, 0.14);
+  color: #a5d6a7;
+}
+
+.exemplar-status.emprestado {
+  background: rgba(208, 170, 87, 0.14);
+  color: #e2bd73;
+}
+
+.catalog-manage-item-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.isbn-search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.isbn-search-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.isbn-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: 1px solid #d0aa57;
+  border-radius: 7px;
+  background: #d0aa57;
+  color: #11100f;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.isbn-search-button:hover {
+  background: #e1bd72;
+}
+
+.isbn-search-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.isbn-search-error {
+  display: block;
+  margin-top: 7px;
+  color: #f0aaa3;
+}
+
+.isbn-search-success {
+  display: block;
+  margin-top: 7px;
+  color: #a5d6a7;
+}
+
+.isbn-authors-warning {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(208, 170, 87, 0.35);
+  border-radius: 8px;
+  background: rgba(208, 170, 87, 0.08);
+  color: #e8dfc9;
+}
+
+.isbn-authors-warning p {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+
+.isbn-authors-warning small {
+  color: #b8ad9d;
+}
+
+@media (max-width: 520px) {
+  .isbn-search-row {
+    flex-direction: column;
+  }
+
+  .isbn-search-button {
+    width: 100%;
+  }
+}

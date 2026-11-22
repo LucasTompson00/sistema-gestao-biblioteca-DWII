@@ -15,6 +15,7 @@ import {
   Save,
   Users,
   Tags,
+  Package,
 } from "lucide-react";
 
 import { useAuth } from "../context/useAuth";
@@ -40,6 +41,15 @@ import {
   excluirGenero,
 } from "../api/generos";
 
+import {
+  listarExemplares,
+  cadastrarExemplar,
+  atualizarExemplar,
+  excluirExemplar,
+} from "../api/exemplares";
+
+import { buscarLivroPorIsbn } from "../api/openLibrary";
+
 import "./Home.css";
 
 function criarLivroVazio() {
@@ -62,8 +72,117 @@ function obterMensagemErro(erro) {
   }
 
   return (
-    erro.response?.data?.message || "Não foi possível realizar a operação."
+    erro.response?.data?.message ||
+    erro.message ||
+    "Não foi possível realizar a operação."
   );
+}
+
+function normalizarTexto(texto) {
+  return String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+function extrairGeneros(assuntos) {
+  const lista = Array.isArray(assuntos)
+    ? assuntos.map(normalizarTexto)
+    : [];
+
+  const regras = [
+    {
+      nome: "Ficção científica",
+      termos: ["science fiction", "sci-fi"],
+    },
+    {
+      nome: "Ficção histórica",
+      termos: ["historical fiction"],
+    },
+    {
+      nome: "Literatura infantil",
+      termos: ["children's fiction", "juvenile fiction"],
+    },
+    {
+      nome: "Literatura juvenil",
+      termos: ["young adult fiction", "young adult literature"],
+    },
+    {
+      nome: "Fantasia",
+      termos: ["fantasy"],
+    },
+    {
+      nome: "Mistério",
+      termos: ["detective and mystery", "mystery fiction"],
+    },
+    {
+      nome: "Suspense",
+      termos: ["thriller fiction", "suspense fiction", "thrillers"],
+    },
+    {
+      nome: "Terror",
+      termos: ["horror fiction", "horror stories"],
+    },
+    {
+      nome: "Romance",
+      termos: ["romance fiction", "love stories"],
+    },
+    {
+      nome: "Aventura",
+      termos: ["adventure fiction", "adventure stories"],
+    },
+    {
+      nome: "Poesia",
+      termos: ["poetry"],
+    },
+    {
+      nome: "Drama",
+      termos: ["drama"],
+    },
+    {
+      nome: "Contos",
+      termos: ["short stories"],
+    },
+    {
+      nome: "Biografia",
+      termos: ["biography"],
+    },
+    {
+      nome: "Autobiografia",
+      termos: ["autobiography"],
+    },
+    {
+      nome: "Quadrinhos",
+      termos: ["graphic novels", "comic books", "comics"],
+    },
+    {
+      nome: "Humor",
+      termos: ["humorous stories", "humor"],
+    },
+    {
+      nome: "Ficção",
+      termos: ["fiction"],
+    },
+  ];
+
+  const encontrados = regras
+    .filter((regra) =>
+      lista.some((assunto) =>
+        regra.termos.some((termo) => assunto.includes(termo)),
+      ),
+    )
+    .map((regra) => regra.nome);
+
+  const generosEspecificos = encontrados.filter(
+    (genero) => genero !== "Ficção",
+  );
+
+  if (generosEspecificos.length > 0) {
+    return [...new Set(generosEspecificos)];
+  }
+
+  return [...new Set(encontrados)];
 }
 
 function Home() {
@@ -91,6 +210,16 @@ function Home() {
   const [erroFormulario, setErroFormulario] = useState("");
   const [feedback, setFeedback] = useState("");
 
+  const [buscandoOpenLibrary, setBuscandoOpenLibrary] = useState(false);
+  const [erroBuscaIsbn, setErroBuscaIsbn] = useState("");
+  const [feedbackBuscaIsbn, setFeedbackBuscaIsbn] = useState("");
+
+  const [autoresCriadosAutomaticamente, setAutoresCriadosAutomaticamente] =
+    useState([]);
+
+  const [generosCriadosAutomaticamente, setGenerosCriadosAutomaticamente] =
+    useState([]);
+
   const [tipoGerenciamento, setTipoGerenciamento] = useState(null);
   const [registroEditando, setRegistroEditando] = useState(null);
 
@@ -106,6 +235,19 @@ function Home() {
 
   const [erroGerenciamento, setErroGerenciamento] = useState("");
   const [sucessoGerenciamento, setSucessoGerenciamento] = useState("");
+
+  const [modalExemplaresAberto, setModalExemplaresAberto] = useState(false);
+  const [livroSelecionado, setLivroSelecionado] = useState(null);
+
+  const [exemplares, setExemplares] = useState([]);
+  const [carregandoExemplares, setCarregandoExemplares] = useState(false);
+  const [salvandoExemplar, setSalvandoExemplar] = useState(false);
+
+  const [exemplarEditando, setExemplarEditando] = useState(null);
+  const [formExemplar, setFormExemplar] = useState({ codigo: "" });
+
+  const [erroExemplares, setErroExemplares] = useState("");
+  const [feedbackExemplares, setFeedbackExemplares] = useState("");
 
   const { usuario, logout } = useAuth();
   const navigate = useNavigate();
@@ -178,15 +320,17 @@ function Home() {
             capa: livro.capa,
             ano_publicacao: String(livro.ano_publicacao),
             autores: (livro.autores || []).map((autor) => String(autor.id)),
-            generos: (livro.generos || []).map((genero) =>
-              String(genero.id),
-            ),
+            generos: (livro.generos || []).map((genero) => String(genero.id)),
           }
         : criarLivroVazio(),
     );
 
     setErroFormulario("");
     setFeedback("");
+    setErroBuscaIsbn("");
+    setFeedbackBuscaIsbn("");
+    setAutoresCriadosAutomaticamente([]);
+    setGenerosCriadosAutomaticamente([]);
     setModalAberto(true);
     setCarregandoOpcoes(true);
 
@@ -212,6 +356,129 @@ function Home() {
       ...anterior,
       [name]: value,
     }));
+
+    if (name === "isbn") {
+      setErroBuscaIsbn("");
+      setFeedbackBuscaIsbn("");
+      setAutoresCriadosAutomaticamente([]);
+      setGenerosCriadosAutomaticamente([]);
+    }
+  }
+
+  async function buscarDadosOpenLibrary() {
+    setErroBuscaIsbn("");
+    setFeedbackBuscaIsbn("");
+    setAutoresCriadosAutomaticamente([]);
+    setGenerosCriadosAutomaticamente([]);
+
+    const isbn = formLivro.isbn.trim();
+
+    if (!isbn) {
+      setErroBuscaIsbn("Informe o ISBN antes de realizar a busca.");
+      return;
+    }
+
+    setBuscandoOpenLibrary(true);
+
+    try {
+      const dados = await buscarLivroPorIsbn(isbn);
+
+      const nomesAutoresApi = [
+        ...new Map(
+          (Array.isArray(dados.autores) ? dados.autores : [])
+            .filter((nome) => typeof nome === "string" && nome.trim())
+            .map((nome) => [normalizarTexto(nome), nome.trim()]),
+        ).values(),
+      ];
+
+      const autoresFaltantes = nomesAutoresApi.filter(
+        (nomeApi) =>
+          !autores.some(
+            (autor) =>
+              normalizarTexto(autor.nome) === normalizarTexto(nomeApi),
+          ),
+      );
+
+      for (const nome of autoresFaltantes) {
+        await cadastrarAutor({
+          nome,
+          biografia: null,
+        });
+      }
+
+      const nomesGenerosApi = extrairGeneros(dados.assuntos);
+
+      const generosFaltantes = nomesGenerosApi.filter(
+        (nomeApi) =>
+          !generos.some(
+            (genero) =>
+              normalizarTexto(genero.nome) === normalizarTexto(nomeApi),
+          ),
+      );
+
+      for (const nome of generosFaltantes) {
+        await cadastrarGenero({ nome });
+      }
+
+      const [autoresAtualizados, generosAtualizados] = await Promise.all([
+        listarAutores(),
+        listarGeneros(),
+      ]);
+
+      setAutores(autoresAtualizados);
+      setGeneros(generosAtualizados);
+
+      setAutoresCriadosAutomaticamente(autoresFaltantes);
+      setGenerosCriadosAutomaticamente(generosFaltantes);
+
+      const autoresCorrespondentes = autoresAtualizados.filter((autor) =>
+        nomesAutoresApi.some(
+          (nome) => normalizarTexto(nome) === normalizarTexto(autor.nome),
+        ),
+      );
+
+      const generosCorrespondentes = generosAtualizados.filter((genero) =>
+        nomesGenerosApi.some(
+          (nome) => normalizarTexto(nome) === normalizarTexto(genero.nome),
+        ),
+      );
+
+      setFormLivro((anterior) => ({
+        ...anterior,
+        titulo: dados.titulo || anterior.titulo,
+        sinopse: dados.sinopse || anterior.sinopse,
+        capa: dados.capa || anterior.capa,
+        ano_publicacao: dados.ano_publicacao || anterior.ano_publicacao,
+        autores: autoresCorrespondentes.map((autor) => String(autor.id)),
+        generos: generosCorrespondentes.map((genero) => String(genero.id)),
+      }));
+
+      const mensagens = [];
+
+      if (autoresFaltantes.length > 0) {
+        mensagens.push(
+          `${autoresFaltantes.length} autor(es) cadastrado(s)`,
+        );
+      }
+
+      if (generosFaltantes.length > 0) {
+        mensagens.push(
+          `${generosFaltantes.length} gênero(s) cadastrado(s)`,
+        );
+      }
+
+      setFeedbackBuscaIsbn(
+        mensagens.length > 0
+          ? `${mensagens.join(" e ")} automaticamente. Confira os dados do livro.`
+          : nomesGenerosApi.length > 0
+            ? "Dados encontrados! Autores e gêneros já estavam cadastrados."
+            : "Dados encontrados! A consulta não retornou gêneros reconhecidos.",
+      );
+    } catch (error) {
+      setErroBuscaIsbn(obterMensagemErro(error));
+    } finally {
+      setBuscandoOpenLibrary(false);
+    }
   }
 
   function alternarSelecao(tipo, id, selecionado) {
@@ -302,11 +569,15 @@ function Home() {
   }
 
   function fecharFormulario() {
-    if (salvandoLivro) return;
+    if (salvandoLivro || buscandoOpenLibrary) return;
 
     setModalAberto(false);
     setLivroEditando(null);
     setErroFormulario("");
+    setErroBuscaIsbn("");
+    setFeedbackBuscaIsbn("");
+    setAutoresCriadosAutomaticamente([]);
+    setGenerosCriadosAutomaticamente([]);
     setFormLivro(criarLivroVazio());
   }
 
@@ -470,6 +741,131 @@ function Home() {
     setSucessoGerenciamento("");
   }
 
+  async function abrirGerenciamentoExemplares(livro) {
+    if (!bibliotecario) return;
+
+    setLivroSelecionado(livro);
+    setExemplarEditando(null);
+    setFormExemplar({ codigo: "" });
+    setErroExemplares("");
+    setFeedbackExemplares("");
+    setModalExemplaresAberto(true);
+    setCarregandoExemplares(true);
+
+    try {
+      const dados = await listarExemplares();
+      setExemplares(dados);
+    } catch (error) {
+      setErroExemplares(obterMensagemErro(error));
+    } finally {
+      setCarregandoExemplares(false);
+    }
+  }
+
+  function editarExemplar(exemplar) {
+    setExemplarEditando(exemplar);
+    setFormExemplar({ codigo: exemplar.codigo });
+    setErroExemplares("");
+    setFeedbackExemplares("");
+  }
+
+  function atualizarCampoExemplar(event) {
+    const { name, value } = event.target;
+
+    setFormExemplar((anterior) => ({
+      ...anterior,
+      [name]: value,
+    }));
+  }
+
+  function cancelarEdicaoExemplar() {
+    setExemplarEditando(null);
+    setFormExemplar({ codigo: "" });
+    setErroExemplares("");
+  }
+
+  async function salvarExemplar(event) {
+    event.preventDefault();
+
+    setErroExemplares("");
+    setFeedbackExemplares("");
+
+    const codigo = formExemplar.codigo.trim();
+
+    if (!codigo) {
+      setErroExemplares("Informe o código do exemplar.");
+      return;
+    }
+
+    setSalvandoExemplar(true);
+
+    const dados = {
+      livro_id: Number(livroSelecionado.id),
+      codigo,
+    };
+
+    try {
+      if (exemplarEditando) {
+        await atualizarExemplar(exemplarEditando.id, dados);
+      } else {
+        await cadastrarExemplar(dados);
+      }
+
+      const exemplaresAtualizados = await listarExemplares();
+      setExemplares(exemplaresAtualizados);
+
+      setExemplarEditando(null);
+      setFormExemplar({ codigo: "" });
+
+      setFeedbackExemplares(
+        exemplarEditando
+          ? "Exemplar atualizado com sucesso."
+          : "Exemplar cadastrado com sucesso.",
+      );
+    } catch (error) {
+      setErroExemplares(obterMensagemErro(error));
+    } finally {
+      setSalvandoExemplar(false);
+    }
+  }
+
+  async function removerExemplar(exemplar) {
+    const confirmar = window.confirm(
+      `Deseja realmente excluir o exemplar "${exemplar.codigo}"?`,
+    );
+
+    if (!confirmar) return;
+
+    setErroExemplares("");
+    setFeedbackExemplares("");
+
+    try {
+      await excluirExemplar(exemplar.id);
+
+      const exemplaresAtualizados = await listarExemplares();
+      setExemplares(exemplaresAtualizados);
+
+      if (exemplarEditando?.id === exemplar.id) {
+        cancelarEdicaoExemplar();
+      }
+
+      setFeedbackExemplares("Exemplar excluído com sucesso.");
+    } catch (error) {
+      setErroExemplares(obterMensagemErro(error));
+    }
+  }
+
+  function fecharModalExemplares() {
+    if (salvandoExemplar) return;
+
+    setModalExemplaresAberto(false);
+    setLivroSelecionado(null);
+    setExemplarEditando(null);
+    setFormExemplar({ codigo: "" });
+    setErroExemplares("");
+    setFeedbackExemplares("");
+  }
+
   const categories = [
     "Todos",
     ...new Set(
@@ -496,6 +892,13 @@ function Home() {
 
   const registrosGerenciamento =
     tipoGerenciamento === "autores" ? autores : generos;
+
+  const exemplaresDoLivro = livroSelecionado
+    ? exemplares.filter(
+        (exemplar) =>
+          Number(exemplar.livro_id) === Number(livroSelecionado.id),
+      )
+    : [];
 
   return (
     <div className="home-page">
@@ -580,8 +983,8 @@ function Home() {
             <h1>Encontre seu próximo livro.</h1>
 
             <p>
-              Consulte o acervo da biblioteca, encontre títulos e descubra
-              novas leituras.
+              Consulte o acervo da biblioteca, encontre títulos e descubra novas
+              leituras.
             </p>
 
             <div className="hero-search">
@@ -663,9 +1066,7 @@ function Home() {
             <div>
               <span>ACERVO</span>
 
-              <h2>
-                {category === "Todos" ? "Livros em destaque" : category}
-              </h2>
+              <h2>{category === "Todos" ? "Livros em destaque" : category}</h2>
             </div>
 
             <span className="catalog-count">
@@ -723,6 +1124,14 @@ function Home() {
 
                       {bibliotecario && (
                         <div className="book-admin-actions">
+                          <button
+                            type="button"
+                            onClick={() => abrirGerenciamentoExemplares(book)}
+                          >
+                            <Package size={14} />
+                            Exemplares
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => abrirFormulario(book)}
@@ -813,7 +1222,7 @@ function Home() {
               <button
                 type="button"
                 onClick={fecharFormulario}
-                disabled={salvandoLivro}
+                disabled={salvandoLivro || buscandoOpenLibrary}
                 aria-label="Fechar formulário"
               >
                 <X size={22} />
@@ -845,24 +1254,77 @@ function Home() {
                     />
                   </div>
 
-                  <div className="book-form-field">
+                  <div className="book-form-field full">
                     <label htmlFor="isbn">ISBN</label>
 
-                    <input
-                      id="isbn"
-                      name="isbn"
-                      type="text"
-                      maxLength="20"
-                      value={formLivro.isbn}
-                      onChange={atualizarCampo}
-                      required
-                    />
+                    <div className="isbn-search-row">
+                      <input
+                        id="isbn"
+                        name="isbn"
+                        type="text"
+                        maxLength="20"
+                        value={formLivro.isbn}
+                        onChange={atualizarCampo}
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        className="isbn-search-button"
+                        onClick={buscarDadosOpenLibrary}
+                        disabled={
+                          buscandoOpenLibrary ||
+                          salvandoLivro ||
+                          !formLivro.isbn.trim()
+                        }
+                      >
+                        <Search size={16} />
+
+                        {buscandoOpenLibrary ? "Buscando..." : "Buscar dados"}
+                      </button>
+                    </div>
+
+                    {erroBuscaIsbn && (
+                      <small className="isbn-search-error">
+                        {erroBuscaIsbn}
+                      </small>
+                    )}
+
+                    {feedbackBuscaIsbn && (
+                      <small className="isbn-search-success">
+                        {feedbackBuscaIsbn}
+                      </small>
+                    )}
+
+                    {autoresCriadosAutomaticamente.length > 0 && (
+                      <div className="isbn-authors-warning">
+                        <strong>Autores cadastrados automaticamente:</strong>
+
+                        <p>{autoresCriadosAutomaticamente.join(", ")}</p>
+
+                        <small>
+                          Os autores foram adicionados ao acervo e selecionados
+                          para este livro.
+                        </small>
+                      </div>
+                    )}
+
+                    {generosCriadosAutomaticamente.length > 0 && (
+                      <div className="isbn-authors-warning">
+                        <strong>Gêneros cadastrados automaticamente:</strong>
+
+                        <p>{generosCriadosAutomaticamente.join(", ")}</p>
+
+                        <small>
+                          Os gêneros foram adicionados ao acervo e selecionados
+                          para este livro.
+                        </small>
+                      </div>
+                    )}
                   </div>
 
                   <div className="book-form-field">
-                    <label htmlFor="ano_publicacao">
-                      Ano de publicação
-                    </label>
+                    <label htmlFor="ano_publicacao">Ano de publicação</label>
 
                     <input
                       id="ano_publicacao"
@@ -875,9 +1337,7 @@ function Home() {
                   </div>
 
                   <div className="book-form-field full">
-                    <label htmlFor="capa">
-                      Caminho ou endereço da capa
-                    </label>
+                    <label htmlFor="capa">Caminho ou endereço da capa</label>
 
                     <input
                       id="capa"
@@ -976,7 +1436,7 @@ function Home() {
                     type="button"
                     className="book-form-cancel"
                     onClick={fecharFormulario}
-                    disabled={salvandoLivro}
+                    disabled={salvandoLivro || buscandoOpenLibrary}
                   >
                     Cancelar
                   </button>
@@ -986,6 +1446,7 @@ function Home() {
                     className="book-form-save"
                     disabled={
                       salvandoLivro ||
+                      buscandoOpenLibrary ||
                       autores.length === 0 ||
                       generos.length === 0
                     }
@@ -1006,10 +1467,7 @@ function Home() {
       )}
 
       {tipoGerenciamento && (
-        <div
-          className="book-modal-overlay"
-          onClick={fecharGerenciamento}
-        >
+        <div className="book-modal-overlay" onClick={fecharGerenciamento}>
           <section
             className="book-modal catalog-manage-modal"
             role="dialog"
@@ -1039,9 +1497,7 @@ function Home() {
             </header>
 
             {erroGerenciamento && (
-              <div className="catalog-manage-error">
-                {erroGerenciamento}
-              </div>
+              <div className="catalog-manage-error">{erroGerenciamento}</div>
             )}
 
             {sucessoGerenciamento && (
@@ -1054,10 +1510,7 @@ function Home() {
               <p>Carregando registros...</p>
             ) : (
               <div className="catalog-manage-content">
-                <form
-                  className="catalog-manage-form"
-                  onSubmit={salvarRegistro}
-                >
+                <form className="catalog-manage-form" onSubmit={salvarRegistro}>
                   <h3>
                     {registroEditando ? "Editar registro" : "Novo registro"}
                   </h3>
@@ -1101,10 +1554,7 @@ function Home() {
                       </button>
                     )}
 
-                    <button
-                      type="submit"
-                      disabled={salvandoGerenciamento}
-                    >
+                    <button type="submit" disabled={salvandoGerenciamento}>
                       <Save size={16} />
 
                       {salvandoGerenciamento
@@ -1127,17 +1577,12 @@ function Home() {
                     <p>Nenhum registro cadastrado.</p>
                   ) : (
                     registrosGerenciamento.map((item) => (
-                      <article
-                        className="catalog-manage-item"
-                        key={item.id}
-                      >
+                      <article className="catalog-manage-item" key={item.id}>
                         <div>
                           <strong>{item.nome}</strong>
 
                           {tipoGerenciamento === "autores" &&
-                            item.biografia && (
-                              <p>{item.biografia}</p>
-                            )}
+                            item.biografia && <p>{item.biografia}</p>}
                         </div>
 
                         <div className="catalog-manage-item-actions">
@@ -1153,6 +1598,153 @@ function Home() {
                             type="button"
                             className="book-delete"
                             onClick={() => removerRegistro(item)}
+                          >
+                            <Trash2 size={14} />
+                            Excluir
+                          </button>
+                        </div>
+                      </article>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+
+      {modalExemplaresAberto && livroSelecionado && (
+        <div className="book-modal-overlay" onClick={fecharModalExemplares}>
+          <section
+            className="book-modal catalog-manage-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exemplar-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="book-modal-header">
+              <div>
+                <span>GERENCIAMENTO DO ACERVO</span>
+
+                <h2 id="exemplar-modal-title">Exemplares</h2>
+                <p>{livroSelecionado.titulo}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={fecharModalExemplares}
+                disabled={salvandoExemplar}
+                aria-label="Fechar gerenciamento"
+              >
+                <X size={22} />
+              </button>
+            </header>
+
+            {erroExemplares && (
+              <div className="catalog-manage-error">{erroExemplares}</div>
+            )}
+
+            {feedbackExemplares && (
+              <div className="catalog-manage-success">
+                {feedbackExemplares}
+              </div>
+            )}
+
+            {carregandoExemplares ? (
+              <p>Carregando exemplares...</p>
+            ) : (
+              <div className="catalog-manage-content">
+                <form className="catalog-manage-form" onSubmit={salvarExemplar}>
+                  <h3>
+                    {exemplarEditando ? "Editar exemplar" : "Novo exemplar"}
+                  </h3>
+
+                  <div className="book-form-field">
+                    <label htmlFor="codigoExemplar">Código do exemplar</label>
+
+                    <input
+                      id="codigoExemplar"
+                      name="codigo"
+                      type="text"
+                      value={formExemplar.codigo}
+                      onChange={atualizarCampoExemplar}
+                      required
+                    />
+                  </div>
+
+                  <div className="catalog-manage-form-actions">
+                    {exemplarEditando && (
+                      <button
+                        type="button"
+                        onClick={cancelarEdicaoExemplar}
+                        disabled={salvandoExemplar}
+                      >
+                        Cancelar
+                      </button>
+                    )}
+
+                    <button type="submit" disabled={salvandoExemplar}>
+                      <Save size={16} />
+
+                      {salvandoExemplar
+                        ? "Salvando..."
+                        : exemplarEditando
+                          ? "Salvar alterações"
+                          : "Cadastrar"}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="catalog-manage-list">
+                  <h3>Exemplares cadastrados</h3>
+
+                  {exemplaresDoLivro.length === 0 ? (
+                    <p>Nenhum exemplar cadastrado para este livro.</p>
+                  ) : (
+                    exemplaresDoLivro.map((exemplar) => (
+                      <article
+                        className="catalog-manage-item"
+                        key={exemplar.id}
+                      >
+                        <div>
+                          <strong>{exemplar.codigo}</strong>
+
+                          <span
+                            className={`exemplar-status ${exemplar.status}`}
+                          >
+                            {exemplar.status === "disponivel"
+                              ? "Disponível"
+                              : exemplar.status === "emprestado"
+                                ? "Emprestado"
+                                : exemplar.status}
+                          </span>
+                        </div>
+
+                        <div className="catalog-manage-item-actions">
+                          <button
+                            type="button"
+                            onClick={() => editarExemplar(exemplar)}
+                            disabled={exemplar.status !== "disponivel"}
+                            title={
+                              exemplar.status !== "disponivel"
+                                ? "Não é possível editar um exemplar emprestado."
+                                : "Editar exemplar"
+                            }
+                          >
+                            <Pencil size={14} />
+                            Editar
+                          </button>
+
+                          <button
+                            type="button"
+                            className="book-delete"
+                            onClick={() => removerExemplar(exemplar)}
+                            disabled={exemplar.status !== "disponivel"}
+                            title={
+                              exemplar.status !== "disponivel"
+                                ? "Não é possível excluir um exemplar emprestado."
+                                : "Excluir exemplar"
+                            }
                           >
                             <Trash2 size={14} />
                             Excluir
