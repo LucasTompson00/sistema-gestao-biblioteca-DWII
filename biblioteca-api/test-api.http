@@ -49,3 +49,110 @@ Content-Type: application/json
 Accept: application/json
 
 {}
+
+
+### Atualizar ISBN do livro
+
+PATCH http://127.0.0.1:8000/api/v1/livros/3
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "isbn": "9788577807000"
+}
+
+### Testar cadastro com ISBN duplicado
+
+POST http://127.0.0.1:8000/api/v1/livros
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "titulo": "Livro de teste",
+    "isbn": "9788577807000",
+    "sinopse": "Teste de validação de ISBN duplicado.",
+    "capa": "teste.jpg",
+    "ano_publicacao": 2020,
+    "autores": [],
+    "generos": []
+}
+
+### Listar autores
+GET http://127.0.0.1:8000/api/v1/autores
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Listar gêneros
+GET http://127.0.0.1:8000/api/v1/generos
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Cadastrar Andrew Hunt
+POST http://127.0.0.1:8000/api/v1/autores
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nome": "Andrew Hunt"
+}
+
+### Cadastrar David Thomas
+POST http://127.0.0.1:8000/api/v1/autores
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nome": "David Thomas"
+}
+
+### Cadastrar gênero
+POST http://127.0.0.1:8000/api/v1/generos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "nome": "Programação"
+}
+
+### Cadastrar livro de teste
+POST http://127.0.0.1:8000/api/v1/livros
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "titulo": "Livro de Teste da API",
+    "isbn": "9788577807001",
+    "sinopse": "Livro utilizado para testar o cadastro e os relacionamentos da API.",
+    "capa": "livro-teste.jpg",
+    "ano_publicacao": 2025,
+    "autores": [2, 3],
+    "generos": [2]
+}
+
+### Atualizar livro e seus relacionamentos
+PATCH http://127.0.0.1:8000/api/v1/livros/4
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "titulo": "Livro de Teste da API - Atualizado",
+    "autores": [3],
+    "generos": [2]
+}
+
+### Tentar excluir livro com exemplar
+DELETE http://127.0.0.1:8000/api/v1/livros/3
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Excluir livro de teste
+DELETE http://127.0.0.1:8000/api/v1/livros/4
+Accept: application/json
+Authorization: Bearer {{token}}

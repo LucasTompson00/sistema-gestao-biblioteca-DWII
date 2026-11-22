@@ -15,7 +15,7 @@ class StoreLivroRequest extends FormRequest
     {
         return [
             'titulo' => ['required', 'string', 'max:150'],
-            'isbn' => ['required', 'string', 'max:20'],
+            'isbn' => ['required', 'string', 'max:20', 'unique:livros,isbn'],
             'sinopse' => ['required', 'string'],
             'capa' => ['required', 'string', 'max:200'],
             'ano_publicacao' => ['required', 'integer'],
@@ -43,6 +43,7 @@ class StoreLivroRequest extends FormRequest
             'generos.array' => 'Os gêneros devem ser enviados em uma lista.',
             'generos.min' => 'Selecione pelo menos um gênero.',
             'generos.*.exists' => 'Um dos gêneros selecionados não existe.',
+            'isbn.unique' => 'Este ISBN já está cadastrado.',
         ];
     }
 }

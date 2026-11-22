@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateLivroRequest extends FormRequest
 {
@@ -15,7 +16,13 @@ class UpdateLivroRequest extends FormRequest
     {
         return [
             'titulo' => ['sometimes', 'required', 'string', 'max:150'],
-            'isbn' => ['sometimes', 'required', 'string', 'max:20'],
+            'isbn' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('livros', 'isbn')->ignore($this->route('livro')->id),
+            ],
             'sinopse' => ['sometimes', 'required', 'string'],
             'capa' => ['sometimes', 'required', 'string', 'max:200'],
             'ano_publicacao' => ['sometimes', 'required', 'integer'],
@@ -39,6 +46,7 @@ class UpdateLivroRequest extends FormRequest
             'autores.*.exists' => 'Um dos autores selecionados não existe.',
             'generos.required' => 'Selecione pelo menos um gênero.',
             'generos.*.exists' => 'Um dos gêneros selecionados não existe.',
+            'isbn.unique' => 'Este ISBN já está cadastrado.',
         ];
     }
 }

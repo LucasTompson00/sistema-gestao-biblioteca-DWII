@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Autor;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreAutorRequest;
+use App\Http\Requests\UpdateAutorRequest;
 
 class AutorController extends Controller
 {
@@ -14,13 +15,12 @@ class AutorController extends Controller
         return response()->json($autores);
     }
 
-    public function store(Request $request)
+    public function store(StoreAutorRequest $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-        ]);
+        $dados = $request->validated();
 
         $autor = Autor::create($dados);
+        $autor->load('livros');
 
         return response()->json($autor, 201);
     }
@@ -32,19 +32,24 @@ class AutorController extends Controller
         return response()->json($autor);
     }
 
-    public function update(Request $request, Autor $autor)
+    public function update(UpdateAutorRequest $request, Autor $autor)
     {
-        $dados = $request->validate([
-            'nome' => 'sometimes|required|string|max:255',
-        ]);
+        $dados = $request->validated();
 
         $autor->update($dados);
+        $autor->load('livros');
 
         return response()->json($autor);
     }
 
     public function destroy(Autor $autor)
     {
+        if ($autor->livros()->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir um autor que possui livros associados.'
+            ], 409);
+        }
+
         $autor->delete();
 
         return response()->noContent();

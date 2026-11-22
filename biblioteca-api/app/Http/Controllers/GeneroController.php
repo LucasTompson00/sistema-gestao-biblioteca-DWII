@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Genero;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreGeneroRequest;
+use App\Http\Requests\UpdateGeneroRequest;
 
 class GeneroController extends Controller
 {
@@ -14,13 +15,12 @@ class GeneroController extends Controller
         return response()->json($generos);
     }
 
-    public function store(Request $request)
+    public function store(StoreGeneroRequest $request)
     {
-        $dados = $request->validate([
-            'nome' => 'required|string|max:255',
-        ]);
+        $dados = $request->validated();
 
         $genero = Genero::create($dados);
+        $genero->load('livros');
 
         return response()->json($genero, 201);
     }
@@ -32,19 +32,24 @@ class GeneroController extends Controller
         return response()->json($genero);
     }
 
-    public function update(Request $request, Genero $genero)
+    public function update(UpdateGeneroRequest $request, Genero $genero)
     {
-        $dados = $request->validate([
-            'nome' => 'sometimes|required|string|max:255',
-        ]);
+        $dados = $request->validated();
 
         $genero->update($dados);
+        $genero->load('livros');
 
         return response()->json($genero);
     }
 
     public function destroy(Genero $genero)
     {
+        if ($genero->livros()->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir um gênero que possui livros associados.'
+            ], 409);
+        }
+
         $genero->delete();
 
         return response()->noContent();
