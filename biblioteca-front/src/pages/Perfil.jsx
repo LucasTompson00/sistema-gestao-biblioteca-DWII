@@ -15,20 +15,16 @@ function obterDadosSalvos(chavePerfil) {
 }
 
 export default function Perfil() {
-  const { usuario: usuarioAutenticado } = useAuth();
+  const { usuario: usuarioAutenticado, atualizarPerfil } = useAuth();
   const navigate = useNavigate();
 
   const chavePerfil = usuarioAutenticado?.id
     ? `perfilGava_${usuarioAutenticado.id}`
     : null;
 
-  const [usuario, setUsuario] = useState(() => {
-    const dadosSalvos = obterDadosSalvos(chavePerfil);
-
-    return {
-      nome: dadosSalvos?.usuario?.nome ?? usuarioAutenticado?.nome ?? "",
-      email: dadosSalvos?.usuario?.email ?? usuarioAutenticado?.email ?? "",
-    };
+  const [usuario, setUsuario] = useState({
+    nome: usuarioAutenticado?.nome ?? "",
+    email: usuarioAutenticado?.email ?? "",
   });
 
   const [foto, setFoto] = useState(
@@ -36,6 +32,7 @@ export default function Perfil() {
   );
 
   const [editando, setEditando] = useState(false);
+  const [salvando, setSalvando] = useState(false);
 
   const inputFoto = useRef(null);
 
@@ -58,39 +55,56 @@ export default function Perfil() {
     leitor.readAsDataURL(arquivo);
   }
 
-  function salvarAlteracoes() {
+  async function salvarAlteracoes() {
     try {
       if (!chavePerfil) {
         throw new Error("Não foi possível identificar o usuário.");
       }
 
-      const dados = {
-        usuario,
-        foto,
-      };
+      setSalvando(true);
 
-      localStorage.setItem(chavePerfil, JSON.stringify(dados));
+      const usuarioAtualizado = await atualizarPerfil(usuario);
+
+      setUsuario({
+        nome: usuarioAtualizado.nome,
+        email: usuarioAtualizado.email,
+      });
+
+      try {
+        localStorage.setItem(chavePerfil, JSON.stringify({ foto }));
+      } catch (erroFoto) {
+        console.error("Erro ao salvar foto:", erroFoto);
+        alert(
+          "Seus dados foram atualizados, mas não foi possível salvar a foto.",
+        );
+      }
 
       setEditando(false);
 
-      alert(
-        "Perfil salvo neste navegador. A atualização no banco de dados ainda não está implementada.",
-      );
+      alert("Perfil atualizado com sucesso.");
     } catch (erro) {
-      console.error("Erro ao salvar perfil:", erro);
-      alert("Não foi possível salvar. Verifique o tamanho da imagem.");
+      console.error("Erro ao atualizar perfil:", erro);
+
+      const errosValidacao = erro.response?.data?.errors;
+
+      const mensagem = errosValidacao
+        ? Object.values(errosValidacao).flat().join("\n")
+        : erro.response?.data?.message ||
+          "Não foi possível atualizar o perfil.";
+
+      alert(mensagem);
+    } finally {
+      setSalvando(false);
     }
   }
 
   function cancelarAlteracoes() {
-    const dadosSalvos = obterDadosSalvos(chavePerfil);
-
     setUsuario({
-      nome: dadosSalvos?.usuario?.nome ?? usuarioAutenticado?.nome ?? "",
-      email: dadosSalvos?.usuario?.email ?? usuarioAutenticado?.email ?? "",
+      nome: usuarioAutenticado?.nome ?? "",
+      email: usuarioAutenticado?.email ?? "",
     });
 
-    setFoto(dadosSalvos?.foto ?? null);
+    setFoto(obterDadosSalvos(chavePerfil)?.foto ?? null);
     setEditando(false);
   }
 
@@ -130,6 +144,7 @@ export default function Perfil() {
                 type="button"
                 onClick={() => inputFoto.current.click()}
                 title="Alterar foto"
+                disabled={!editando || salvando}
               >
                 <Camera size={18} />
               </button>
@@ -160,7 +175,7 @@ export default function Perfil() {
               <input
                 type="text"
                 value={usuario.nome}
-                disabled={!editando}
+                disabled={!editando || salvando}
                 onChange={(event) =>
                   setUsuario({
                     ...usuario,
@@ -179,7 +194,7 @@ export default function Perfil() {
                 <input
                   type="email"
                   value={usuario.email}
-                  disabled={!editando}
+                  disabled={!editando || salvando}
                   onChange={(event) =>
                     setUsuario({
                       ...usuario,
@@ -205,6 +220,7 @@ export default function Perfil() {
                     className="perfil-btn-cancelar"
                     type="button"
                     onClick={cancelarAlteracoes}
+                    disabled={salvando}
                   >
                     <X size={18} />
                     Cancelar
@@ -214,9 +230,10 @@ export default function Perfil() {
                     className="perfil-btn-salvar"
                     type="button"
                     onClick={salvarAlteracoes}
+                    disabled={salvando}
                   >
                     <Save size={18} />
-                    Salvar alterações
+                    {salvando ? "Salvando..." : "Salvar alterações"}
                   </button>
                 </>
               )}
