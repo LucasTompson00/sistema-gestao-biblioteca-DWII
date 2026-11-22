@@ -413,17 +413,21 @@
     padding-top: 15px;
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
     border-top: 1px solid #30201e;
 }
 
 .emprestimo-btn-devolver,
-.emprestimo-btn-excluir {
+.emprestimo-btn-excluir,
+.emprestimo-btn-editar,
+.emprestimo-btn-cancelar {
     min-height: 37px;
-    padding: 0 13px;
+    padding: 0 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 7px;
     border: 1px solid;
     border-radius: 2px;
     font-size: 0.68rem;
@@ -453,7 +457,79 @@
     border-color: #914b3d;
 }
 
-/* VAZIO */
+.emprestimo-btn-editar {
+    background: #2a2118;
+    border-color: #80633a;
+    color: #e2bc70;
+}
+
+.emprestimo-btn-editar:hover {
+    background: #3b2c1c;
+}
+
+.emprestimo-btn-cancelar {
+    background: transparent;
+    border-color: #49302a;
+    color: #b5a99d;
+}
+
+.emprestimo-btn-cancelar:hover {
+    background: #2b201d;
+    color: #e8ddc9;
+}
+
+.emprestimo-btn-editar:disabled,
+.emprestimo-btn-cancelar:disabled,
+.emprestimo-btn-devolver:disabled,
+.emprestimo-btn-excluir:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* EDIÇÃO DA PREVISÃO */
+
+.emprestimo-edicao-previsao {
+    margin-top: 20px;
+    padding: 17px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #211b19;
+    border: 1px solid #49302a;
+    border-left: 2px solid #c9a34e;
+}
+
+.emprestimo-edicao-previsao label {
+    color: #d8cbbb;
+    font-size: 0.73rem;
+    font-weight: 600;
+}
+
+.emprestimo-edicao-previsao input {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid #49302a;
+    border-radius: 2px;
+    outline: none;
+    background: #181413;
+    color: #e8ddc9;
+    color-scheme: dark;
+    font-size: 0.78rem;
+}
+
+.emprestimo-edicao-previsao input:focus {
+    border-color: #a17b43;
+}
+
+.emprestimo-edicao-botoes {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+/* VAZIO E CARREGAMENTO */
 
 .emprestimos-vazio {
     min-height: 230px;

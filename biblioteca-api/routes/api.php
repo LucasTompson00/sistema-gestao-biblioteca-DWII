@@ -8,6 +8,7 @@ use App\Http\Controllers\ExemplarController;
 use App\Http\Controllers\GeneroController;
 use App\Http\Controllers\LivroController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UsuarioController;
 
 Route::prefix('v1')->group(function () {
 
@@ -69,6 +70,7 @@ Route::prefix('v1')->group(function () {
                 '/emprestimos/{emprestimo}/devolucao',
                 DevolucaoController::class
             );
+            Route::get('/usuarios', [UsuarioController::class, 'index']);
         });
     });
 });

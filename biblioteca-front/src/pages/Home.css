@@ -816,3 +816,611 @@
     padding: 20px;
   }
 }
+
+
+/* GERENCIAMENTO DO ACERVO */
+
+.catalog-management {
+    margin-bottom: 30px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: #181413;
+    border: 1px solid #49302a;
+    border-left: 2px solid #d0aa57;
+}
+
+.catalog-management span {
+    color: #c19b4e;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.catalog-management p {
+    margin: 7px 0 0;
+    color: #a99d90;
+    font-size: 0.78rem;
+}
+
+.catalog-management button {
+    min-height: 40px;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #9b783d;
+    border-radius: 2px;
+    background: #c9a34e;
+    color: #211714;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.catalog-management button:hover {
+    background: #d4b261;
+}
+
+.catalog-count {
+    color: #a99d90;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.catalog-feedback {
+    margin-bottom: 20px;
+    padding: 13px 16px;
+    background: #18241b;
+    border: 1px solid #36563c;
+    color: #a7d1ad;
+    font-size: 0.78rem;
+}
+
+.catalog-feedback.erro {
+    background: #2a1715;
+    border-color: #66312b;
+    color: #df9b91;
+}
+
+/* AÇÕES DOS LIVROS */
+
+.book-admin-actions {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.book-admin-actions button {
+    min-height: 31px;
+    padding: 0 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid #80633a;
+    border-radius: 2px;
+    background: #2a2118;
+    color: #e2bc70;
+    font-size: 0.64rem;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.book-admin-actions button:hover {
+    background: #3b2c1c;
+}
+
+.book-admin-actions button.book-delete {
+    border-color: #62302a;
+    background: #291615;
+    color: #d99b8e;
+}
+
+.book-admin-actions button.book-delete:hover {
+    background: #3b1b19;
+}
+
+/* MODAL DO LIVRO */
+
+.book-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    padding: 25px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(3px);
+}
+
+.book-modal {
+    width: min(760px, 100%);
+    max-height: 92vh;
+    overflow-y: auto;
+    background: #181413;
+    border: 1px solid #68402f;
+    border-top: 2px solid #c9a34e;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.5);
+}
+
+.book-modal-header {
+    padding: 23px 27px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #352522;
+}
+
+.book-modal-header span {
+    color: #c19b4e;
+    font-size: 0.59rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.book-modal-header h2 {
+    margin: 9px 0 0;
+    color: #e9dfd0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.book-modal-header button {
+    width: 37px;
+    height: 37px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #49302a;
+    background: transparent;
+    color: #b9aea1;
+    cursor: pointer;
+}
+
+.book-modal-header button:hover {
+    color: #e2c477;
+    border-color: #80633a;
+}
+
+.book-form {
+    padding: 25px 27px;
+}
+
+.book-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.book-form-field {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.book-form-field.full {
+    grid-column: 1 / -1;
+}
+
+.book-form-field > label {
+    color: #d8cbbb;
+    font-size: 0.73rem;
+    font-weight: 600;
+}
+
+.book-form-field input:not([type="checkbox"]),
+.book-form-field textarea {
+    width: 100%;
+    min-height: 43px;
+    padding: 11px 12px;
+    border: 1px solid #49302a;
+    border-radius: 2px;
+    outline: none;
+    background: #211b19;
+    color: #e8ddc9;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.77rem;
+    transition: border-color 0.2s ease;
+}
+
+.book-form-field textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.book-form-field input:focus,
+.book-form-field textarea:focus {
+    border-color: #a17b43;
+}
+
+.book-form-field input::placeholder {
+    color: #84786e;
+}
+
+.book-form-relations {
+    margin-top: 24px;
+    padding-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    border-top: 1px solid #352522;
+}
+
+.book-check-list {
+    max-height: 170px;
+    min-height: 65px;
+    padding: 9px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    border: 1px solid #49302a;
+    background: #211b19;
+}
+
+.book-check-option {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #cfc5b6;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.book-check-option input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    accent-color: #c9a34e;
+    cursor: pointer;
+}
+
+.book-check-list small {
+    color: #b99a69;
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+
+.book-form-error {
+    margin: 20px 27px 0;
+    padding: 12px 14px;
+    background: #2a1715;
+    border: 1px solid #66312b;
+    color: #df9b91;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.book-form-loading {
+    padding: 35px;
+    color: #a99d90;
+    text-align: center;
+    font-size: 0.78rem;
+}
+
+.book-form-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: 1px solid #352522;
+}
+
+.book-form-footer button {
+    min-height: 41px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.book-form-cancel {
+    border-color: #49302a !important;
+    background: transparent;
+    color: #b9aea1;
+}
+
+.book-form-cancel:hover {
+    background: #2b201d;
+    color: #e8ddc9;
+}
+
+.book-form-save {
+    border-color: #b18d43 !important;
+    background: #c9a34e;
+    color: #211714;
+}
+
+.book-form-save:hover:not(:disabled) {
+    background: #d4b261;
+}
+
+.book-form-save:disabled,
+.book-form-cancel:disabled,
+.book-modal-header button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 600px) {
+    .catalog-management {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .catalog-management button {
+        width: 100%;
+    }
+
+    .book-modal-header {
+        padding: 19px;
+    }
+
+    .book-form {
+        padding: 20px 19px;
+    }
+
+    .book-form-grid,
+    .book-form-relations {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .book-form-footer {
+        flex-direction: column-reverse;
+    }
+
+    .book-form-footer button {
+        width: 100%;
+    }
+
+    .book-admin-actions button {
+        flex: 1;
+    }
+}
+
+.catalog-management-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.catalog-management-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 15px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.catalog-manage-button {
+  background: transparent;
+  color: #e8dfc9;
+  border: 1px solid rgba(208, 170, 87, 0.4);
+}
+
+.catalog-manage-button:hover {
+  background: rgba(208, 170, 87, 0.12);
+  border-color: #d0aa57;
+}
+
+.catalog-add-book-button {
+  background: #d0aa57;
+  color: #11100f;
+  border: 1px solid #d0aa57;
+}
+
+.catalog-add-book-button:hover {
+  background: #e1bd72;
+}
+
+.catalog-manage-modal {
+  width: min(900px, calc(100vw - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.catalog-manage-content {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.catalog-manage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: start;
+  padding: 18px;
+  border: 1px solid rgba(208, 170, 87, 0.2);
+  border-radius: 10px;
+  background: #171513;
+}
+
+.catalog-manage-form h3,
+.catalog-manage-list h3 {
+  margin: 0 0 4px;
+  color: #e8dfc9;
+  font-size: 1.05rem;
+}
+
+.catalog-manage-form input,
+.catalog-manage-form textarea {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #40382f;
+  border-radius: 7px;
+  background: #11100f;
+  color: #e8dfc9;
+  font: inherit;
+  resize: vertical;
+}
+
+.catalog-manage-form input:focus,
+.catalog-manage-form textarea:focus {
+  outline: none;
+  border-color: #d0aa57;
+}
+
+.catalog-manage-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.catalog-manage-form-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 13px;
+  border: 1px solid #d0aa57;
+  border-radius: 7px;
+  background: #d0aa57;
+  color: #11100f;
+  font: inherit;
+  cursor: pointer;
+}
+
+.catalog-manage-form-actions button:first-child:not(:last-child) {
+  border-color: #665b4b;
+  background: transparent;
+  color: #e8dfc9;
+}
+
+.catalog-manage-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.catalog-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.catalog-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid #39322b;
+  border-radius: 9px;
+  background: #171513;
+}
+
+.catalog-manage-item > div:first-child {
+  min-width: 0;
+}
+
+.catalog-manage-item strong {
+  color: #e8dfc9;
+  overflow-wrap: anywhere;
+}
+
+.catalog-manage-item p {
+  margin: 5px 0 0;
+  color: #a99e8e;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.catalog-manage-item-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 7px;
+}
+
+.catalog-manage-item-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  border: 1px solid #665b4b;
+  border-radius: 6px;
+  background: transparent;
+  color: #e8dfc9;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.catalog-manage-item-actions button:hover {
+  border-color: #d0aa57;
+}
+
+.catalog-manage-item-actions .book-delete {
+  color: #e18b83;
+  border-color: rgba(225, 139, 131, 0.35);
+}
+
+.catalog-manage-error,
+.catalog-manage-success {
+  margin-top: 15px;
+  padding: 11px 13px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+}
+
+.catalog-manage-error {
+  color: #f0aaa3;
+  background: rgba(180, 65, 55, 0.13);
+  border: 1px solid rgba(180, 65, 55, 0.35);
+}
+
+.catalog-manage-success {
+  color: #a5d6a7;
+  background: rgba(76, 140, 80, 0.12);
+  border: 1px solid rgba(76, 140, 80, 0.3);
+}
+
+@media (max-width: 750px) {
+  .catalog-management-actions {
+    justify-content: flex-start;
+  }
+
+  .catalog-manage-content {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-manage-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .catalog-manage-item-actions {
+    width: 100%;
+  }
+}

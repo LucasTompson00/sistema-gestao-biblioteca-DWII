@@ -5,7 +5,16 @@ export async function listarExemplares() {
     return data;
 }
 
-export async function buscarExemplar(id) {
-    const { data } = await api.get(`/exemplares/${id}`);
+export async function cadastrarExemplar(dados) {
+    const { data } = await api.post("/exemplares", dados);
     return data;
+}
+
+export async function atualizarExemplar(id, dados) {
+    const { data } = await api.put(`/exemplares/${id}`, dados);
+    return data;
+}
+
+export async function excluirExemplar(id) {
+    await api.delete(`/exemplares/${id}`);
 }
