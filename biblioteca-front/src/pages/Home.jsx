@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -11,16 +11,40 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
+import { listarLivros } from "../api/livros";
 import "./Home.css";
 
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [books, setBooks] = useState([]);
+  const [carregandoLivros, setCarregandoLivros] = useState(true);
+  const [erroLivros, setErroLivros] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Todos");
 
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function carregarLivros() {
+      try {
+        const dados = await listarLivros();
+        setBooks(dados);
+      } catch (error) {
+        console.error("Erro ao carregar livros:", error);
+
+        setErroLivros(
+          error.response?.data?.message ||
+          "Não foi possível carregar o acervo."
+        );
+      } finally {
+        setCarregandoLivros(false);
+      }
+    }
+
+    carregarLivros();
+  }, []);
 
   async function handleLogout() {
     setLoading(true);
@@ -35,76 +59,26 @@ function Home() {
 
   const categories = [
     "Todos",
-    "Literatura Brasileira",
-    "Literatura Estrangeira",
-    "Romance",
-    "Filosofia",
-    "História",
-    "Tecnologia",
-    "Infantil",
-  ];
-
-  const books = [
-    {
-      title: "Dom Casmurro",
-      isbn: "9788535914849",
-      year: "1899",
-      category: "Literatura Brasileira",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788535914849-L.jpg",
-    },
-    {
-      title: "O Alienista",
-      isbn: "9788535902778",
-      year: "1882",
-      category: "Literatura Brasileira",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788535902778-L.jpg",
-    },
-    {
-      title: "Memórias Póstumas de Brás Cubas",
-      isbn: "9788535911671",
-      year: "1881",
-      category: "Literatura Brasileira",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788535911671-L.jpg",
-    },
-    {
-      title: "A Arte da Guerra",
-      isbn: "9788572835977",
-      year: "2000",
-      category: "Filosofia",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788572835977-L.jpg",
-    },
-    {
-      title: "Alice no País das Maravilhas",
-      isbn: "9788535909050",
-      year: "1865",
-      category: "Literatura Estrangeira",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788535909050-L.jpg",
-    },
-    {
-      title: "A República",
-      isbn: "9788572835978",
-      year: "380 a.C.",
-      category: "Filosofia",
-      image:
-        "https://covers.openlibrary.org/b/isbn/9788572835978-L.jpg",
-    },
+    ...new Set(
+      books.flatMap((book) =>
+        (book.generos || []).map((genero) => genero.nome)
+      )
+    ),
   ];
 
   const filteredBooks = books.filter((book) => {
     const matchesCategory =
-      category === "Todos" || book.category === category;
+      category === "Todos" ||
+      (book.generos || []).some(
+        (genero) => genero.nome === category
+      );
 
     const searchText = search.toLowerCase().trim();
 
     const matchesSearch =
       !searchText ||
-      book.title.toLowerCase().includes(searchText) ||
-      book.isbn.toLowerCase().includes(searchText);
+      (book.titulo || "").toLowerCase().includes(searchText) ||
+      (book.isbn || "").toLowerCase().includes(searchText);
 
     return matchesCategory && matchesSearch;
   });
@@ -227,6 +201,7 @@ function Home() {
           <div className="section-title">
             <div>
               <span>ACERVO</span>
+
               <h2>
                 {category === "Todos"
                   ? "Livros em destaque"
@@ -246,32 +221,46 @@ function Home() {
             </button>
 
             <div className="book-grid">
-              {filteredBooks.map((book) => (
-                <article className="book-card" key={book.isbn}>
-                  <div className="book-cover">
-                    <img
-                      src={book.image}
-                      alt={`Capa de ${book.title}`}
-                    />
-                  </div>
+              {carregandoLivros ? (
+                <p>Carregando acervo...</p>
+              ) : erroLivros ? (
+                <p className="error-message">{erroLivros}</p>
+              ) : (
+                <>
+                  {filteredBooks.map((book) => (
+                    <article className="book-card" key={book.id}>
+                      <div className="book-cover">
+                        {book.capa && (
+                          <img
+                            src={book.capa}
+                            alt={`Capa de ${book.titulo}`}
+                          />
+                        )}
+                      </div>
 
-                  <div className="book-data">
-                    <span>{book.category}</span>
+                      <div className="book-data">
+                        <span>
+                          {(book.generos || [])
+                            .map((genero) => genero.nome)
+                            .join(", ") || "Sem gênero"}
+                        </span>
 
-                    <h3>{book.title}</h3>
+                        <h3>{book.titulo}</h3>
 
-                    <p>ISBN {book.isbn}</p>
+                        <p>ISBN {book.isbn}</p>
 
-                    <small>{book.year}</small>
-                  </div>
-                </article>
-              ))}
+                        <small>{book.ano_publicacao}</small>
+                      </div>
+                    </article>
+                  ))}
 
-              {filteredBooks.length === 0 && (
-                <div className="empty-result">
-                  <BookOpen size={30} />
-                  <p>Nenhum livro encontrado.</p>
-                </div>
+                  {filteredBooks.length === 0 && (
+                    <div className="empty-result">
+                      <BookOpen size={30} />
+                      <p>Nenhum livro encontrado.</p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

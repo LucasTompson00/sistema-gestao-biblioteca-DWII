@@ -1,21 +1,39 @@
-import { useState, useRef } from "react";
-import { User, Camera, Save, X, Mail, AtSign, ArrowLeft } from "lucide-react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { User, Camera, Save, X, Mail, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import "./Perfil.css";
 
+function obterDadosSalvos(chavePerfil) {
+  try {
+    return chavePerfil
+      ? JSON.parse(localStorage.getItem(chavePerfil) || "null")
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Perfil() {
-  const dadosSalvos = JSON.parse(localStorage.getItem("perfilGava") || "null");
+  const { usuario: usuarioAutenticado } = useAuth();
+  const navigate = useNavigate();
 
-  const [usuario, setUsuario] = useState(
-    dadosSalvos?.usuario || {
-      nome: "Usuário",
-      username: "usuario_gava",
-      email: "usuario@email.com",
-    },
+  const chavePerfil = usuarioAutenticado?.id
+    ? `perfilGava_${usuarioAutenticado.id}`
+    : null;
+
+  const [usuario, setUsuario] = useState(() => {
+    const dadosSalvos = obterDadosSalvos(chavePerfil);
+
+    return {
+      nome: dadosSalvos?.usuario?.nome ?? usuarioAutenticado?.nome ?? "",
+      email: dadosSalvos?.usuario?.email ?? usuarioAutenticado?.email ?? "",
+    };
+  });
+
+  const [foto, setFoto] = useState(
+    () => obterDadosSalvos(chavePerfil)?.foto ?? null,
   );
-
-  const [foto, setFoto] = useState(dadosSalvos?.foto || null);
-  const [fotoOriginal, setFotoOriginal] = useState(dadosSalvos?.foto || null);
 
   const [editando, setEditando] = useState(false);
 
@@ -42,17 +60,22 @@ export default function Perfil() {
 
   function salvarAlteracoes() {
     try {
+      if (!chavePerfil) {
+        throw new Error("Não foi possível identificar o usuário.");
+      }
+
       const dados = {
-        usuario: usuario,
-        foto: foto,
+        usuario,
+        foto,
       };
 
-      localStorage.setItem("perfilGava", JSON.stringify(dados));
+      localStorage.setItem(chavePerfil, JSON.stringify(dados));
 
-      setFotoOriginal(foto);
       setEditando(false);
 
-      alert("Perfil salvo com sucesso!");
+      alert(
+        "Perfil salvo neste navegador. A atualização no banco de dados ainda não está implementada.",
+      );
     } catch (erro) {
       console.error("Erro ao salvar perfil:", erro);
       alert("Não foi possível salvar. Verifique o tamanho da imagem.");
@@ -60,30 +83,29 @@ export default function Perfil() {
   }
 
   function cancelarAlteracoes() {
-    const dados = JSON.parse(localStorage.getItem("perfilGava") || "null");
+    const dadosSalvos = obterDadosSalvos(chavePerfil);
 
-    if (dados) {
-      setUsuario(dados.usuario);
-      setFoto(dados.foto);
-      setFotoOriginal(dados.foto);
-    } else {
-      setUsuario({
-        nome: "Usuário",
-        username: "usuario_gava",
-        email: "usuario@email.com",
-      });
+    setUsuario({
+      nome: dadosSalvos?.usuario?.nome ?? usuarioAutenticado?.nome ?? "",
+      email: dadosSalvos?.usuario?.email ?? usuarioAutenticado?.email ?? "",
+    });
 
-      setFoto(null);
-      setFotoOriginal(null);
-    }
-
+    setFoto(dadosSalvos?.foto ?? null);
     setEditando(false);
   }
+
+  const fotoPadrao = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    usuario.nome || "Usuario",
+  )}&background=8B5E3C&color=fff&size=200`;
 
   return (
     <div className="perfil-container">
       <header className="perfil-header">
-        <button className="perfil-voltar" onClick={() => window.history.back()}>
+        <button
+          className="perfil-voltar"
+          type="button"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft size={20} />
         </button>
 
@@ -98,19 +120,16 @@ export default function Perfil() {
           <div className="perfil-banner">
             <div className="perfil-foto-container">
               <img
-                src={
-                  foto ||
-                  "https://ui-avatars.com/api/?name=Usuario&background=8B5E3C&color=fff&size=200"
-                }
+                src={foto || fotoPadrao}
                 alt="Foto de perfil"
                 className="perfil-foto"
               />
 
               <button
                 className="perfil-camera"
+                type="button"
                 onClick={() => inputFoto.current.click()}
                 title="Alterar foto"
-                type="button"
               >
                 <Camera size={18} />
               </button>
@@ -124,8 +143,9 @@ export default function Perfil() {
               />
             </div>
 
-            <h2>{usuario.username}</h2>
-            <span>Cliente Gava</span>
+            <h2>{usuario.nome || "Usuário"}</h2>
+
+            <span>{usuarioAutenticado?.perfil || "Usuário da biblioteca"}</span>
           </div>
 
           <div className="perfil-form">
@@ -134,7 +154,6 @@ export default function Perfil() {
               <h3>Informações pessoais</h3>
             </div>
 
-            {/* Nome completo */}
             <div className="perfil-field">
               <label>Nome completo</label>
 
@@ -142,37 +161,15 @@ export default function Perfil() {
                 type="text"
                 value={usuario.nome}
                 disabled={!editando}
-                onChange={(e) =>
+                onChange={(event) =>
                   setUsuario({
                     ...usuario,
-                    nome: e.target.value,
+                    nome: event.target.value,
                   })
                 }
               />
             </div>
 
-            {/* Nome de usuário */}
-            <div className="perfil-field">
-              <label>Nome de usuário</label>
-
-              <div className="perfil-input-icon">
-                <AtSign size={18} />
-
-                <input
-                  type="text"
-                  value={usuario.username}
-                  disabled={!editando}
-                  onChange={(e) =>
-                    setUsuario({
-                      ...usuario,
-                      username: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
-
-            {/* E-mail */}
             <div className="perfil-field">
               <label>E-mail</label>
 
@@ -183,21 +180,21 @@ export default function Perfil() {
                   type="email"
                   value={usuario.email}
                   disabled={!editando}
-                  onChange={(e) =>
+                  onChange={(event) =>
                     setUsuario({
                       ...usuario,
-                      email: e.target.value,
+                      email: event.target.value,
                     })
                   }
                 />
               </div>
             </div>
 
-            {/* Botões */}
             <div className="perfil-buttons">
               {!editando ? (
                 <button
                   className="perfil-btn-editar"
+                  type="button"
                   onClick={() => setEditando(true)}
                 >
                   Editar perfil
@@ -206,6 +203,7 @@ export default function Perfil() {
                 <>
                   <button
                     className="perfil-btn-cancelar"
+                    type="button"
                     onClick={cancelarAlteracoes}
                   >
                     <X size={18} />
@@ -214,6 +212,7 @@ export default function Perfil() {
 
                   <button
                     className="perfil-btn-salvar"
+                    type="button"
                     onClick={salvarAlteracoes}
                   >
                     <Save size={18} />
