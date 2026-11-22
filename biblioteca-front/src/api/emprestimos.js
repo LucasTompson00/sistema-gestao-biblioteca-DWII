@@ -5,18 +5,18 @@ export async function listarEmprestimos() {
     return data;
 }
 
-export async function buscarEmprestimo(id) {
-    const { data } = await api.get(`/emprestimos/${id}`);
-    return data;
-}
-
-export async function cadastrarEmprestimo(dados) {
+export async function registrarEmprestimo(dados) {
     const { data } = await api.post("/emprestimos", dados);
     return data;
 }
 
 export async function atualizarEmprestimo(id, dados) {
-    const { data } = await api.put(`/emprestimos/${id}`, dados);
+    const { data } = await api.patch(`/emprestimos/${id}`, dados);
+    return data;
+}
+
+export async function devolverEmprestimo(id) {
+    const { data } = await api.patch(`/emprestimos/${id}/devolucao`);
     return data;
 }
 

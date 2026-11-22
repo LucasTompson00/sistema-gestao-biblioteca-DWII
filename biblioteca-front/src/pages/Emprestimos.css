@@ -1,0 +1,568 @@
+
+.emprestimos-container {
+    --background: #11100f;
+    --surface: #181413;
+    --surface-light: #211b19;
+    --border: #352522;
+    --gold: #d0aa57;
+    --gold-light: #e2c477;
+    --text: #e8ddc9;
+    --text-muted: #a99d90;
+
+    min-height: 100vh;
+    padding-bottom: 60px;
+    background: var(--background);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.emprestimos-container .main-nav a.active {
+    color: var(--gold);
+}
+
+.emprestimos-container .main-nav a.active::after {
+    transform: scaleX(1);
+}
+
+.emprestimos-container .drawer nav a.active {
+    color: var(--gold);
+}
+
+/* CABEÇALHO */
+
+.emprestimos-header {
+    min-height: 250px;
+    padding: 55px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    background:
+        radial-gradient(
+            circle at 45% 50%,
+            rgba(84, 28, 27, 0.42),
+            transparent 65%
+        ),
+        #151211;
+    border-bottom: 1px solid #3b1b19;
+}
+
+.emprestimos-header h1 {
+    margin: 12px 0;
+    color: #eee4d3;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.emprestimos-header h1::before {
+    display: block;
+    margin-bottom: 12px;
+    color: #c9a34e;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    content: "BIBLIOTECA / CIRCULAÇÃO";
+}
+
+.emprestimos-header p {
+    margin: 0;
+    color: #b9aea1;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.emprestimos-novo {
+    min-height: 46px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    flex-shrink: 0;
+    border: 1px solid #71312a;
+    border-radius: 2px;
+    background: #5a1f1d;
+    color: #eee4d3;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.emprestimos-novo:hover {
+    background: #702522;
+    border-color: #a05b43;
+}
+
+.emprestimos-novo svg {
+    color: var(--gold);
+}
+
+/* MENSAGENS */
+
+.emprestimos-mensagem {
+    width: min(1180px, 88%);
+    margin: 24px auto 0;
+    padding: 14px 17px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid;
+    font-size: 0.8rem;
+}
+
+.emprestimos-mensagem.sucesso {
+    background: #18241b;
+    border-color: #36563c;
+    color: #a7d1ad;
+}
+
+.emprestimos-mensagem.erro {
+    background: #2a1715;
+    border-color: #66312b;
+    color: #df9b91;
+}
+
+/* FORMULÁRIO */
+
+.emprestimos-formulario {
+    width: min(1180px, 88%);
+    margin: 35px auto 0;
+    padding: 27px 30px 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid #7a3028;
+}
+
+.emprestimos-formulario-header {
+    margin-bottom: 25px;
+    padding-bottom: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+}
+
+.emprestimos-formulario-header h2 {
+    margin: 0;
+    color: #e9dfd0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+}
+
+.emprestimos-formulario-header button {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.emprestimos-formulario-header button:hover {
+    color: var(--gold);
+    border-color: var(--border);
+}
+
+.emprestimos-formulario form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 21px;
+}
+
+.emprestimos-campo {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.emprestimos-campo label {
+    color: #d8cbbb;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.emprestimos-campo input,
+.emprestimos-campo select {
+    width: 100%;
+    min-height: 45px;
+    padding: 0 13px;
+    border: 1px solid #49302a;
+    border-radius: 2px;
+    outline: none;
+    background: var(--surface-light);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.78rem;
+    transition: border-color 0.2s ease;
+}
+
+.emprestimos-campo input:focus,
+.emprestimos-campo select:focus {
+    border-color: #a17b43;
+}
+
+.emprestimos-campo input:disabled,
+.emprestimos-campo select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.emprestimos-campo input::placeholder {
+    color: #84786e;
+}
+
+.emprestimos-campo input[type="date"] {
+    color-scheme: dark;
+}
+
+.emprestimos-campo select option {
+    background: #211b19;
+    color: var(--text);
+}
+
+.emprestimos-campo small {
+    color: #91867d;
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.emprestimos-salvar {
+    min-height: 45px;
+    padding: 0 20px;
+    align-self: end;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    background: #c9a34e;
+    color: #211714;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.emprestimos-salvar:hover:not(:disabled) {
+    background: #d4b261;
+}
+
+.emprestimos-salvar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* LISTA */
+
+.emprestimos-lista {
+    width: min(1180px, 88%);
+    margin: 48px auto 0;
+}
+
+.emprestimos-lista-header {
+    min-height: 65px;
+    margin-bottom: 25px;
+    padding-bottom: 17px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid #30201e;
+}
+
+.emprestimos-lista-header h2 {
+    margin: 0;
+    color: #e9dfd0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.65rem;
+    font-weight: 400;
+}
+
+.emprestimos-lista-header h2::before {
+    display: block;
+    margin-bottom: 8px;
+    color: #c19b4e;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 2.3px;
+    content: "ACOMPANHAMENTO";
+}
+
+.emprestimos-lista-header span {
+    color: #a99d90;
+    font-size: 0.72rem;
+}
+
+.emprestimos-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.emprestimo-card {
+    min-width: 0;
+    padding: 23px;
+    background: linear-gradient(145deg, #1d1715, #171312);
+    border: 1px solid var(--border);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.emprestimo-card:hover {
+    border-color: #68402f;
+    transform: translateY(-3px);
+}
+
+.emprestimo-card-topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.emprestimo-livro {
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.emprestimo-livro > svg {
+    margin-top: 2px;
+    flex-shrink: 0;
+    color: var(--gold);
+}
+
+.emprestimo-livro h3 {
+    margin: 0 0 7px;
+    color: #e3d9ca;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.emprestimo-livro span {
+    color: #a99d90;
+    font-size: 0.7rem;
+}
+
+.emprestimo-status {
+    padding: 7px 10px;
+    flex-shrink: 0;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 0.61rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+.emprestimo-status.ativo {
+    background: #332619;
+    border-color: #73542c;
+    color: #e2bc70;
+}
+
+.emprestimo-status.devolvido {
+    background: #1d2a20;
+    border-color: #38563a;
+    color: #9bc59b;
+}
+
+.emprestimo-usuario {
+    margin: 20px 0 0;
+    padding: 12px 0;
+    border-top: 1px solid #30201e;
+    border-bottom: 1px solid #30201e;
+    color: #bfae9d;
+    font-size: 0.73rem;
+}
+
+.emprestimo-datas {
+    margin-top: 19px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.emprestimo-datas div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #b5a99d;
+    font-size: 0.72rem;
+}
+
+.emprestimo-datas svg {
+    flex-shrink: 0;
+    color: #b28b49;
+}
+
+/* AÇÕES */
+
+.emprestimo-acoes {
+    margin-top: 21px;
+    padding-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #30201e;
+}
+
+.emprestimo-btn-devolver,
+.emprestimo-btn-excluir {
+    min-height: 37px;
+    padding: 0 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid;
+    border-radius: 2px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.emprestimo-btn-devolver {
+    background: #c9a34e;
+    border-color: #b18d43;
+    color: #211714;
+}
+
+.emprestimo-btn-devolver:hover {
+    background: #d4b261;
+}
+
+.emprestimo-btn-excluir {
+    background: #291615;
+    border-color: #62302a;
+    color: #d99b8e;
+}
+
+.emprestimo-btn-excluir:hover {
+    background: #3b1b19;
+    border-color: #914b3d;
+}
+
+/* VAZIO */
+
+.emprestimos-vazio {
+    min-height: 230px;
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px dashed #49322b;
+    color: #98897c;
+    text-align: center;
+}
+
+.emprestimos-vazio svg {
+    color: #b18c4b;
+}
+
+.emprestimos-vazio h3 {
+    margin: 0;
+    color: #e3d9ca;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+}
+
+.emprestimos-vazio p {
+    margin: 0;
+    color: #91867d;
+    font-size: 0.76rem;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 800px) {
+    .emprestimos-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .emprestimos-header {
+        padding: 45px 5%;
+    }
+}
+
+@media (max-width: 600px) {
+    .emprestimos-header {
+        min-height: 270px;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        gap: 23px;
+        padding: 38px 6%;
+    }
+
+    .emprestimos-header h1 {
+        font-size: 2.15rem;
+    }
+
+    .emprestimos-header p {
+        font-size: 0.78rem;
+    }
+
+    .emprestimos-novo {
+        width: 100%;
+    }
+
+    .emprestimos-mensagem,
+    .emprestimos-formulario,
+    .emprestimos-lista {
+        width: 88%;
+    }
+
+    .emprestimos-formulario {
+        padding: 21px 17px;
+    }
+
+    .emprestimos-formulario form {
+        grid-template-columns: 1fr;
+        gap: 19px;
+    }
+
+    .emprestimos-lista {
+        margin-top: 38px;
+    }
+
+    .emprestimos-lista-header h2 {
+        font-size: 1.45rem;
+    }
+
+    .emprestimo-card {
+        padding: 19px;
+    }
+
+    .emprestimo-status {
+        font-size: 0.55rem;
+    }
+
+    .emprestimos-vazio {
+        padding: 25px 15px;
+    }
+}
+
+@media (max-width: 380px) {
+    .emprestimo-card-topo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .emprestimo-acoes {
+        justify-content: flex-start;
+    }
+}
