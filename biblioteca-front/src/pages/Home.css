@@ -20,7 +20,6 @@
   box-sizing: border-box;
 }
 
-/* HEADER */
 
 .topbar {
   min-height: 72px;
@@ -103,7 +102,6 @@
   border-color: #9a7134;
 }
 
-/* MENU LATERAL */
 
 .drawer-overlay {
   position: fixed;
@@ -201,7 +199,6 @@
   opacity: 0.6;
 }
 
-/* DESTAQUE PRINCIPAL */
 
 .hero {
   min-height: 330px;
@@ -249,7 +246,6 @@
   line-height: 1.65;
 }
 
-/* BUSCA */
 
 .hero-search {
   width: min(650px, 100%);
@@ -305,7 +301,6 @@
   background: #702522;
 }
 
-/* CATÁLOGO */
 
 .catalog {
   width: min(1180px, 88%);
@@ -362,7 +357,6 @@
   border-color: #71312a;
 }
 
-/* TÍTULO DA SEÇÃO */
 
 .section-title {
   margin: 38px 0 24px;
@@ -401,7 +395,6 @@
   color: var(--gold-light);
 }
 
-/* LIVROS */
 
 .books-area {
   position: relative;
@@ -457,39 +450,38 @@
   content: "Capa indisponível";
 }
 
-/* INFORMAÇÕES DO LIVRO */
 
 .book-data {
   min-width: 0;
-  padding-top: 13px;
+  padding-top: 18px;
 }
 
 .book-data > span {
-  min-height: 17px;
-  margin-bottom: 7px;
+  min-height: 2.8em;
+  margin-bottom: 11px;
   display: -webkit-box;
   overflow: hidden;
-  color: #b28b49;
-  font-size: 0.56rem;
+  color: #c9a34e;
+  font-size: 0.64rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  line-height: 1.5;
+  letter-spacing: 0.6px;
+  line-height: 1.45;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   line-clamp: 2;
 }
 
 .book-data h3 {
-  min-height: 42px;
-  margin: 0 0 8px;
+  min-height: 2.8em;
+  margin: 0 0 13px;
   display: -webkit-box;
   overflow: hidden;
-  color: #e3d9ca;
+  color: #eee4d3;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.4;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -497,19 +489,20 @@
 
 .book-data p {
   margin: 0;
-  color: #91867d;
-  font-size: 0.65rem;
+  color: #b8aea3;
+  font-size: 0.73rem;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
 .book-data small {
   display: block;
-  margin-top: 6px;
-  color: #ad9067;
-  font-size: 0.66rem;
+  margin-top: 9px;
+  color: #d0aa70;
+  font-size: 0.72rem;
+  line-height: 1.5;
 }
 
-/* CARREGAMENTO E ERROS */
 
 .book-grid > p,
 .book-grid > .error-message {
@@ -772,13 +765,29 @@
     padding: 8px;
   }
 
+  .book-data {
+    padding-top: 15px;
+  }
+
   .book-data h3 {
-    min-height: 40px;
-    font-size: 0.84rem;
+    min-height: 2.8em;
+    margin-bottom: 12px;
+    font-size: 0.94rem;
   }
 
   .book-data > span {
-    font-size: 0.51rem;
+    min-height: 2.8em;
+    margin-bottom: 10px;
+    font-size: 0.59rem;
+  }
+
+  .book-data p {
+    font-size: 0.69rem;
+  }
+
+  .book-data small {
+    margin-top: 8px;
+    font-size: 0.69rem;
   }
 
   .book-arrow {
@@ -817,388 +826,384 @@
   }
 }
 
-
 /* GERENCIAMENTO DO ACERVO */
 
 .catalog-management {
-    margin-bottom: 30px;
-    padding: 18px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    background: #181413;
-    border: 1px solid #49302a;
-    border-left: 2px solid #d0aa57;
+  margin-bottom: 30px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #181413;
+  border: 1px solid #49302a;
+  border-left: 2px solid #d0aa57;
 }
 
 .catalog-management span {
-    color: #c19b4e;
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 2px;
+  color: #c19b4e;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .catalog-management p {
-    margin: 7px 0 0;
-    color: #a99d90;
-    font-size: 0.78rem;
+  margin: 7px 0 0;
+  color: #a99d90;
+  font-size: 0.78rem;
 }
 
 .catalog-management button {
-    min-height: 40px;
-    padding: 0 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: 1px solid #9b783d;
-    border-radius: 2px;
-    background: #c9a34e;
-    color: #211714;
-    font-size: 0.72rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
+  min-height: 40px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #9b783d;
+  border-radius: 2px;
+  background: #c9a34e;
+  color: #211714;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .catalog-management button:hover {
-    background: #d4b261;
+  background: #d4b261;
 }
 
 .catalog-count {
-    color: #a99d90;
-    font-size: 0.72rem;
-    white-space: nowrap;
+  color: #a99d90;
+  font-size: 0.72rem;
+  white-space: nowrap;
 }
 
 .catalog-feedback {
-    margin-bottom: 20px;
-    padding: 13px 16px;
-    background: #18241b;
-    border: 1px solid #36563c;
-    color: #a7d1ad;
-    font-size: 0.78rem;
+  margin-bottom: 20px;
+  padding: 13px 16px;
+  background: #18241b;
+  border: 1px solid #36563c;
+  color: #a7d1ad;
+  font-size: 0.78rem;
 }
 
 .catalog-feedback.erro {
-    background: #2a1715;
-    border-color: #66312b;
-    color: #df9b91;
+  background: #2a1715;
+  border-color: #66312b;
+  color: #df9b91;
 }
 
-/* AÇÕES DOS LIVROS */
 
 .book-admin-actions {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
+  margin-top: 17px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .book-admin-actions button {
-    min-height: 31px;
-    padding: 0 9px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    border: 1px solid #80633a;
-    border-radius: 2px;
-    background: #2a2118;
-    color: #e2bc70;
-    font-size: 0.64rem;
-    cursor: pointer;
-    transition: 0.2s ease;
+  min-height: 35px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #80633a;
+  border-radius: 2px;
+  background: #2a2118;
+  color: #e2bc70;
+  font-size: 0.69rem;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .book-admin-actions button:hover {
-    background: #3b2c1c;
+  background: #3b2c1c;
 }
 
 .book-admin-actions button.book-delete {
-    border-color: #62302a;
-    background: #291615;
-    color: #d99b8e;
+  border-color: #62302a;
+  background: #291615;
+  color: #d99b8e;
 }
 
 .book-admin-actions button.book-delete:hover {
-    background: #3b1b19;
+  background: #3b1b19;
 }
 
-/* MODAL DO LIVRO */
 
 .book-modal-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    padding: 25px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(3px);
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  padding: 25px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(3px);
 }
 
 .book-modal {
-    width: min(760px, 100%);
-    max-height: 92vh;
-    overflow-y: auto;
-    background: #181413;
-    border: 1px solid #68402f;
-    border-top: 2px solid #c9a34e;
-    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.5);
+  width: min(760px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #181413;
+  border: 1px solid #68402f;
+  border-top: 2px solid #c9a34e;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.5);
 }
 
 .book-modal-header {
-    padding: 23px 27px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    border-bottom: 1px solid #352522;
+  padding: 23px 27px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #352522;
 }
 
 .book-modal-header span {
-    color: #c19b4e;
-    font-size: 0.59rem;
-    font-weight: 700;
-    letter-spacing: 2px;
+  color: #c19b4e;
+  font-size: 0.59rem;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .book-modal-header h2 {
-    margin: 9px 0 0;
-    color: #e9dfd0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 1.5rem;
-    font-weight: 400;
+  margin: 9px 0 0;
+  color: #e9dfd0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 .book-modal-header button {
-    width: 37px;
-    height: 37px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #49302a;
-    background: transparent;
-    color: #b9aea1;
-    cursor: pointer;
+  width: 37px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #49302a;
+  background: transparent;
+  color: #b9aea1;
+  cursor: pointer;
 }
 
 .book-modal-header button:hover {
-    color: #e2c477;
-    border-color: #80633a;
+  color: #e2c477;
+  border-color: #80633a;
 }
 
 .book-form {
-    padding: 25px 27px;
+  padding: 25px 27px;
 }
 
 .book-form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
 .book-form-field {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 9px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
 
 .book-form-field.full {
-    grid-column: 1 / -1;
+  grid-column: 1 / -1;
 }
 
 .book-form-field > label {
-    color: #d8cbbb;
-    font-size: 0.73rem;
-    font-weight: 600;
+  color: #d8cbbb;
+  font-size: 0.73rem;
+  font-weight: 600;
 }
 
 .book-form-field input:not([type="checkbox"]),
 .book-form-field textarea {
-    width: 100%;
-    min-height: 43px;
-    padding: 11px 12px;
-    border: 1px solid #49302a;
-    border-radius: 2px;
-    outline: none;
-    background: #211b19;
-    color: #e8ddc9;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.77rem;
-    transition: border-color 0.2s ease;
+  width: 100%;
+  min-height: 43px;
+  padding: 11px 12px;
+  border: 1px solid #49302a;
+  border-radius: 2px;
+  outline: none;
+  background: #211b19;
+  color: #e8ddc9;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.77rem;
+  transition: border-color 0.2s ease;
 }
 
 .book-form-field textarea {
-    min-height: 100px;
-    resize: vertical;
-    line-height: 1.5;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
 }
 
 .book-form-field input:focus,
 .book-form-field textarea:focus {
-    border-color: #a17b43;
+  border-color: #a17b43;
 }
 
 .book-form-field input::placeholder {
-    color: #84786e;
+  color: #84786e;
 }
 
 .book-form-relations {
-    margin-top: 24px;
-    padding-top: 22px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-    border-top: 1px solid #352522;
+  margin-top: 24px;
+  padding-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  border-top: 1px solid #352522;
 }
 
 .book-check-list {
-    max-height: 170px;
-    min-height: 65px;
-    padding: 9px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: auto;
-    border: 1px solid #49302a;
-    background: #211b19;
+  max-height: 170px;
+  min-height: 65px;
+  padding: 9px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  border: 1px solid #49302a;
+  background: #211b19;
 }
 
 .book-check-option {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: #cfc5b6;
-    font-size: 0.72rem;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #cfc5b6;
+  font-size: 0.72rem;
+  cursor: pointer;
 }
 
 .book-check-option input {
-    width: 14px;
-    height: 14px;
-    margin: 0;
-    accent-color: #c9a34e;
-    cursor: pointer;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #c9a34e;
+  cursor: pointer;
 }
 
 .book-check-list small {
-    color: #b99a69;
-    font-size: 0.7rem;
-    line-height: 1.5;
+  color: #b99a69;
+  font-size: 0.7rem;
+  line-height: 1.5;
 }
 
 .book-form-error {
-    margin: 20px 27px 0;
-    padding: 12px 14px;
-    background: #2a1715;
-    border: 1px solid #66312b;
-    color: #df9b91;
-    font-size: 0.75rem;
-    line-height: 1.5;
+  margin: 20px 27px 0;
+  padding: 12px 14px;
+  background: #2a1715;
+  border: 1px solid #66312b;
+  color: #df9b91;
+  font-size: 0.75rem;
+  line-height: 1.5;
 }
 
 .book-form-loading {
-    padding: 35px;
-    color: #a99d90;
-    text-align: center;
-    font-size: 0.78rem;
+  padding: 35px;
+  color: #a99d90;
+  text-align: center;
+  font-size: 0.78rem;
 }
 
 .book-form-footer {
-    margin-top: 25px;
-    padding-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 10px;
-    border-top: 1px solid #352522;
+  margin-top: 25px;
+  padding-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid #352522;
 }
 
 .book-form-footer button {
-    min-height: 41px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border: 1px solid;
-    border-radius: 2px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s ease;
+  min-height: 41px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid;
+  border-radius: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
 .book-form-cancel {
-    border-color: #49302a !important;
-    background: transparent;
-    color: #b9aea1;
+  border-color: #49302a !important;
+  background: transparent;
+  color: #b9aea1;
 }
 
 .book-form-cancel:hover {
-    background: #2b201d;
-    color: #e8ddc9;
+  background: #2b201d;
+  color: #e8ddc9;
 }
 
 .book-form-save {
-    border-color: #b18d43 !important;
-    background: #c9a34e;
-    color: #211714;
+  border-color: #b18d43 !important;
+  background: #c9a34e;
+  color: #211714;
 }
 
 .book-form-save:hover:not(:disabled) {
-    background: #d4b261;
+  background: #d4b261;
 }
 
 .book-form-save:disabled,
 .book-form-cancel:disabled,
 .book-modal-header button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* RESPONSIVIDADE */
 
 @media (max-width: 600px) {
-    .catalog-management {
-        align-items: flex-start;
-        flex-direction: column;
-    }
+  .catalog-management {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
-    .catalog-management button {
-        width: 100%;
-    }
+  .catalog-management button {
+    width: 100%;
+  }
 
-    .book-modal-header {
-        padding: 19px;
-    }
+  .book-modal-header {
+    padding: 19px;
+  }
 
-    .book-form {
-        padding: 20px 19px;
-    }
+  .book-form {
+    padding: 20px 19px;
+  }
 
-    .book-form-grid,
-    .book-form-relations {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
+  .book-form-grid,
+  .book-form-relations {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
-    .book-form-footer {
-        flex-direction: column-reverse;
-    }
+  .book-form-footer {
+    flex-direction: column-reverse;
+  }
 
-    .book-form-footer button {
-        width: 100%;
-    }
+  .book-form-footer button {
+    width: 100%;
+  }
 
-    .book-admin-actions button {
-        flex: 1;
-    }
+  .book-admin-actions button {
+    flex: 1;
+  }
 }
 
 .catalog-management-actions {
@@ -1450,6 +1455,7 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 .isbn-search-row {
   display: flex;
   align-items: stretch;
