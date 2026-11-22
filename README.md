@@ -13,8 +13,6 @@ sistema-gestao-biblioteca-DWII/
 └── README.md
 ```
 
-## O que já está implementado
-
 | Módulo | Descrição |
 |---|---|
 | Migrations e Models | Estrutura do banco de dados e representação das entidades com Eloquent ORM |
