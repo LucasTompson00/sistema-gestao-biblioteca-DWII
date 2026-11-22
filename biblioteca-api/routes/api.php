@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\AuthController;
@@ -32,5 +31,10 @@ Route::prefix('v1')->group(function () {
 
         Route::apiResource('emprestimos', EmprestimoController::class)
             ->parameters(['emprestimos' => 'emprestimo']);
+
+        Route::post(
+            '/emprestimos/{emprestimo}/devolver',
+            [EmprestimoController::class, 'devolver']
+        );
     });
 });
