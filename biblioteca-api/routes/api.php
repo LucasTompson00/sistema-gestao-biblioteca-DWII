@@ -7,6 +7,7 @@ use App\Http\Controllers\ExemplarController;
 use App\Http\Controllers\GeneroController;
 use App\Http\Controllers\LivroController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DevolucaoController;
 
 Route::prefix('v1')->group(function () {
 
@@ -32,9 +33,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('emprestimos', EmprestimoController::class)
             ->parameters(['emprestimos' => 'emprestimo']);
 
-        Route::post(
-            '/emprestimos/{emprestimo}/devolver',
-            [EmprestimoController::class, 'devolver']
+        Route::patch(
+            '/emprestimos/{emprestimo}/devolucao',
+            DevolucaoController::class
         );
     });
 });

@@ -1,5 +1,5 @@
 @baseUrl = http://127.0.0.1:8000/api/v1
-@token = 14|LTHlLxpSjixsDsgy2t1HNu0msVIin9br6qExJjBDc24fab63
+@token = 18|3MVDQnp1Km8uLhG4regHiVvsVkfrTv8sRCaKJ8iPc67b21cd
 
 ### Login
 POST {{baseUrl}}/login
@@ -30,3 +30,22 @@ Accept: application/json
 GET {{baseUrl}}/exemplares
 Authorization: Bearer {{token}}
 Accept: application/json
+
+
+### Testar validação de empréstimo
+POST {{baseUrl}}/emprestimos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "data_prevista": "2027-01-15"
+}
+
+### Testar validação de livros
+POST {{baseUrl}}/livros
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{}
