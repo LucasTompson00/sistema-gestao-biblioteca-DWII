@@ -1,5 +1,5 @@
 @baseUrl = http://127.0.0.1:8000/api/v1
-@token = 18|3MVDQnp1Km8uLhG4regHiVvsVkfrTv8sRCaKJ8iPc67b21cd
+@token = 20|7NXEJD2pTPL5erFgxlAKEgu5SUKxBEuRrlVEqkla821a98c2
 
 ### Login
 POST {{baseUrl}}/login
@@ -156,3 +156,64 @@ Authorization: Bearer {{token}}
 DELETE http://127.0.0.1:8000/api/v1/livros/4
 Accept: application/json
 Authorization: Bearer {{token}}
+
+### Verificar autenticação
+GET http://127.0.0.1:8000/api/v1/me
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Consultar exemplares
+GET http://127.0.0.1:8000/api/v1/exemplares
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Registrar empréstimo
+POST http://127.0.0.1:8000/api/v1/emprestimos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "usuario_id": 11,
+    "exemplar_id": 2,
+    "data_prevista": "2026-11-30"
+}
+
+### Consultar empréstimos
+GET http://127.0.0.1:8000/api/v1/emprestimos
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Tentar emprestar exemplar já emprestado
+POST http://127.0.0.1:8000/api/v1/emprestimos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "usuario_id": 11,
+    "exemplar_id": 2,
+    "data_prevista": "2026-11-30"
+}
+
+### Devolver exemplar
+PATCH http://127.0.0.1:8000/api/v1/emprestimos/2/devolucao
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Consultar exemplares
+GET http://127.0.0.1:8000/api/v1/exemplares
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Emprestar novamente o exemplar
+POST http://127.0.0.1:8000/api/v1/emprestimos
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "usuario_id": 11,
+    "exemplar_id": 2,
+    "data_prevista": "2026-11-30"
+}

@@ -125,17 +125,24 @@ class EmprestimoService
         });
     }
 
+
     public function excluir(Emprestimo $emprestimo): void
     {
-        if (
-            $emprestimo->situacao !== 'devolvido' ||
-            $emprestimo->data_devolucao === null
-        ) {
-            throw new RegraEmprestimoException(
-                'Não é possível excluir um empréstimo que ainda não foi devolvido.'
-            );
-        }
+        DB::transaction(function () use ($emprestimo) {
+            $emprestimo = Emprestimo::whereKey($emprestimo->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $emprestimo->delete();
+            if (
+                $emprestimo->situacao !== 'devolvido' ||
+                $emprestimo->data_devolucao === null
+            ) {
+                throw new RegraEmprestimoException(
+                    'Não é possível excluir um empréstimo que ainda não foi devolvido.'
+                );
+            }
+
+            $emprestimo->delete();
+        });
     }
 }
