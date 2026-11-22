@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AutorController;
 use App\Http\Controllers\EmprestimoController;
 use App\Http\Controllers\ExemplarController;
@@ -7,16 +8,33 @@ use App\Http\Controllers\GeneroController;
 use App\Http\Controllers\LivroController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('livros', LivroController::class);
+Route::prefix('v1')->group(function () {
 
-Route::apiResource('autores', AutorController::class)
-    ->parameters(['autores' => 'autor']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
 
-Route::apiResource('generos', GeneroController::class)
-    ->parameters(['generos' => 'genero']);
+    Route::middleware('auth:sanctum')->group(function () {
 
-Route::apiResource('exemplares', ExemplarController::class)
-    ->parameters(['exemplares' => 'exemplar']);
+        Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-Route::apiResource('emprestimos', EmprestimoController::class)
-    ->parameters(['emprestimos' => 'emprestimo']);
+        Route::apiResource('livros', LivroController::class);
+
+        Route::apiResource('autores', AutorController::class)
+            ->parameters(['autores' => 'autor']);
+
+        Route::apiResource('generos', GeneroController::class)
+            ->parameters(['generos' => 'genero']);
+
+        Route::apiResource('exemplares', ExemplarController::class)
+            ->parameters(['exemplares' => 'exemplar']);
+
+        Route::apiResource('emprestimos', EmprestimoController::class)
+            ->parameters(['emprestimos' => 'emprestimo']);
+
+        Route::post(
+            '/emprestimos/{emprestimo}/devolver',
+            [EmprestimoController::class, 'devolver']
+        );
+    });
+});
