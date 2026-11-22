@@ -1525,3 +1525,62 @@
     width: 100%;
   }
 }
+
+.book-file-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed rgba(208, 170, 87, 0.5);
+  border-radius: 8px;
+  background: #171513;
+  color: #d0aa57;
+}
+
+.book-file-input input {
+  width: 100%;
+  min-width: 0;
+  color: #e8dfc9;
+  font: inherit;
+  cursor: pointer;
+}
+
+.book-file-input input::file-selector-button {
+  margin-right: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #d0aa57;
+  color: #11100f;
+  cursor: pointer;
+}
+
+.book-cover-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.book-cover-preview > span {
+  color: #d0aa57;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.book-cover-preview img {
+  width: 100px;
+  max-height: 145px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.book-form-field > small {
+  display: block;
+  margin-top: 6px;
+  color: #a99e8e;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}

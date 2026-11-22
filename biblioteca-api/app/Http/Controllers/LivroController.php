@@ -6,6 +6,8 @@ use App\Http\Requests\StoreLivroRequest;
 use App\Http\Requests\UpdateLivroRequest;
 use App\Models\Livro;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class LivroController extends Controller
 {
@@ -24,19 +26,35 @@ class LivroController extends Controller
     {
         $dados = $request->validated();
 
-        $livro = DB::transaction(function () use ($dados) {
-            $autores = $dados['autores'];
-            $generos = $dados['generos'];
+        $arquivoCapa = $dados['arquivo_capa'] ?? null;
 
-            unset($dados['autores'], $dados['generos']);
+        unset($dados['arquivo_capa']);
 
-            $livro = Livro::create($dados);
+        if ($arquivoCapa) {
+            $dados['capa'] = $arquivoCapa->store('capas', 'public');
+        }
 
-            $livro->autores()->sync($autores);
-            $livro->generos()->sync($generos);
+        try {
+            $livro = DB::transaction(function () use ($dados) {
+                $autores = $dados['autores'];
+                $generos = $dados['generos'];
 
-            return $livro;
-        });
+                unset($dados['autores'], $dados['generos']);
+
+                $livro = Livro::create($dados);
+
+                $livro->autores()->sync($autores);
+                $livro->generos()->sync($generos);
+
+                return $livro;
+            });
+        } catch (Throwable $erro) {
+            if ($arquivoCapa) {
+                Storage::disk('public')->delete($dados['capa']);
+            }
+
+            throw $erro;
+        }
 
         $livro->load([
             'autores',
@@ -62,27 +80,49 @@ class LivroController extends Controller
     {
         $dados = $request->validated();
 
-        $autores = $dados['autores'] ?? null;
-        $generos = $dados['generos'] ?? null;
+        $arquivoCapa = $dados['arquivo_capa'] ?? null;
 
-        unset($dados['autores'], $dados['generos']);
+        unset($dados['arquivo_capa']);
 
-        DB::transaction(function () use (
-            $dados,
-            $livro,
-            $autores,
-            $generos
-        ) {
-            $livro->update($dados);
+        $capaAntiga = $livro->capa;
 
-            if ($autores !== null) {
-                $livro->autores()->sync($autores);
+        if ($arquivoCapa) {
+            $dados['capa'] = $arquivoCapa->store('capas', 'public');
+        }
+
+        $capaNova = $dados['capa'] ?? $capaAntiga;
+
+        try {
+            DB::transaction(function () use (
+                $dados,
+                $livro
+            ) {
+                $autores = $dados['autores'] ?? null;
+                $generos = $dados['generos'] ?? null;
+
+                unset($dados['autores'], $dados['generos']);
+
+                $livro->update($dados);
+
+                if ($autores !== null) {
+                    $livro->autores()->sync($autores);
+                }
+
+                if ($generos !== null) {
+                    $livro->generos()->sync($generos);
+                }
+            });
+        } catch (Throwable $erro) {
+            if ($arquivoCapa) {
+                Storage::disk('public')->delete($capaNova);
             }
 
-            if ($generos !== null) {
-                $livro->generos()->sync($generos);
-            }
-        });
+            throw $erro;
+        }
+
+        if ($capaNova !== $capaAntiga) {
+            $this->excluirCapaArmazenada($capaAntiga);
+        }
 
         $livro->load([
             'autores',
@@ -91,6 +131,29 @@ class LivroController extends Controller
         ]);
 
         return response()->json($livro);
+    }
+
+    public function downloadCapa(Livro $livro)
+    {
+        $caminho = $livro->capa;
+
+        if (
+            !$caminho ||
+            filter_var($caminho, FILTER_VALIDATE_URL) ||
+            !Storage::disk('public')->exists($caminho)
+        ) {
+            return response()->json([
+                'message' => 'Arquivo de capa não encontrado.',
+            ], 404);
+        }
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disco */
+        $disco = Storage::disk('public');
+
+        return $disco->download(
+            $caminho,
+            basename($caminho)
+        );
     }
 
     public function destroy(Livro $livro)
@@ -107,6 +170,18 @@ class LivroController extends Controller
             $livro->delete();
         });
 
+        $this->excluirCapaArmazenada($livro->capa);
+
         return response()->noContent();
+    }
+
+    private function excluirCapaArmazenada(?string $caminho): void
+    {
+        if (
+            $caminho &&
+            !filter_var($caminho, FILTER_VALIDATE_URL)
+        ) {
+            Storage::disk('public')->delete($caminho);
+        }
     }
 }

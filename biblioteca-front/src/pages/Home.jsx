@@ -16,6 +16,7 @@ import {
   Users,
   Tags,
   Package,
+  ImagePlus,
 } from "lucide-react";
 
 import { useAuth } from "../context/useAuth";
@@ -207,6 +208,9 @@ function Home() {
 
   const [formLivro, setFormLivro] = useState(criarLivroVazio());
 
+  const [arquivoCapa, setArquivoCapa] = useState(null);
+  const [capaAtualUrl, setCapaAtualUrl] = useState("");
+
   const [erroFormulario, setErroFormulario] = useState("");
   const [feedback, setFeedback] = useState("");
 
@@ -309,6 +313,10 @@ function Home() {
   async function abrirFormulario(livro = null) {
     if (!bibliotecario) return;
 
+    const capaEhUrl =
+      typeof livro?.capa === "string" &&
+      /^https?:\/\//i.test(livro.capa);
+
     setLivroEditando(livro?.id ?? null);
 
     setFormLivro(
@@ -317,13 +325,16 @@ function Home() {
             titulo: livro.titulo,
             isbn: livro.isbn,
             sinopse: livro.sinopse,
-            capa: livro.capa,
+            capa: capaEhUrl ? livro.capa : "",
             ano_publicacao: String(livro.ano_publicacao),
             autores: (livro.autores || []).map((autor) => String(autor.id)),
             generos: (livro.generos || []).map((genero) => String(genero.id)),
           }
         : criarLivroVazio(),
     );
+
+    setArquivoCapa(null);
+    setCapaAtualUrl(livro?.capa_url || (capaEhUrl ? livro.capa : ""));
 
     setErroFormulario("");
     setFeedback("");
@@ -357,12 +368,43 @@ function Home() {
       [name]: value,
     }));
 
+    if (name === "capa") {
+      setCapaAtualUrl(value);
+    }
+
     if (name === "isbn") {
       setErroBuscaIsbn("");
       setFeedbackBuscaIsbn("");
       setAutoresCriadosAutomaticamente([]);
       setGenerosCriadosAutomaticamente([]);
     }
+  }
+
+  function selecionarArquivoCapa(event) {
+    const arquivo = event.target.files?.[0];
+
+    if (!arquivo) return;
+
+    const formatosPermitidos = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!formatosPermitidos.includes(arquivo.type)) {
+      setErroFormulario("Selecione uma imagem JPG, JPEG, PNG ou WEBP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (arquivo.size > 2 * 1024 * 1024) {
+      setErroFormulario("A imagem da capa deve ter no máximo 2 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setArquivoCapa(arquivo);
+    setErroFormulario("");
   }
 
   async function buscarDadosOpenLibrary() {
@@ -453,18 +495,18 @@ function Home() {
         generos: generosCorrespondentes.map((genero) => String(genero.id)),
       }));
 
+      if (dados.capa) {
+        setCapaAtualUrl(dados.capa);
+      }
+
       const mensagens = [];
 
       if (autoresFaltantes.length > 0) {
-        mensagens.push(
-          `${autoresFaltantes.length} autor(es) cadastrado(s)`,
-        );
+        mensagens.push(`${autoresFaltantes.length} autor(es) cadastrado(s)`);
       }
 
       if (generosFaltantes.length > 0) {
-        mensagens.push(
-          `${generosFaltantes.length} gênero(s) cadastrado(s)`,
-        );
+        mensagens.push(`${generosFaltantes.length} gênero(s) cadastrado(s)`);
       }
 
       setFeedbackBuscaIsbn(
@@ -514,28 +556,65 @@ function Home() {
       return;
     }
 
+    if (!formLivro.capa.trim() && !arquivoCapa && !livroEditando) {
+      setErroFormulario("Informe um endereço de capa ou selecione uma imagem.");
+      setSalvandoLivro(false);
+      return;
+    }
+
     const dados = {
       titulo: formLivro.titulo.trim(),
       isbn: formLivro.isbn.trim(),
       sinopse: formLivro.sinopse.trim(),
-      capa: formLivro.capa.trim(),
       ano_publicacao: Number(formLivro.ano_publicacao),
       autores: formLivro.autores.map(Number),
       generos: formLivro.generos.map(Number),
     };
 
+    if (formLivro.capa.trim()) {
+      dados.capa = formLivro.capa.trim();
+    }
+
+    let dadosEnvio = dados;
+
+    if (arquivoCapa) {
+      const formulario = new FormData();
+
+      formulario.append("titulo", dados.titulo);
+      formulario.append("isbn", dados.isbn);
+      formulario.append("sinopse", dados.sinopse);
+      formulario.append("ano_publicacao", String(dados.ano_publicacao));
+      formulario.append("arquivo_capa", arquivoCapa);
+
+      if (dados.capa) {
+        formulario.append("capa", dados.capa);
+      }
+
+      dados.autores.forEach((id) => {
+        formulario.append("autores[]", String(id));
+      });
+
+      dados.generos.forEach((id) => {
+        formulario.append("generos[]", String(id));
+      });
+
+      dadosEnvio = formulario;
+    }
+
     try {
       if (livroEditando) {
-        await atualizarLivro(livroEditando, dados);
+        await atualizarLivro(livroEditando, dadosEnvio);
         setFeedback("Livro atualizado com sucesso.");
       } else {
-        await cadastrarLivro(dados);
+        await cadastrarLivro(dadosEnvio);
         setFeedback("Livro cadastrado com sucesso.");
       }
 
       setModalAberto(false);
       setLivroEditando(null);
       setFormLivro(criarLivroVazio());
+      setArquivoCapa(null);
+      setCapaAtualUrl("");
 
       await carregarCatalogo();
     } catch (error) {
@@ -573,12 +652,14 @@ function Home() {
 
     setModalAberto(false);
     setLivroEditando(null);
+    setFormLivro(criarLivroVazio());
+    setArquivoCapa(null);
+    setCapaAtualUrl("");
     setErroFormulario("");
     setErroBuscaIsbn("");
     setFeedbackBuscaIsbn("");
     setAutoresCriadosAutomaticamente([]);
     setGenerosCriadosAutomaticamente([]);
-    setFormLivro(criarLivroVazio());
   }
 
   async function abrirGerenciamento(tipo) {
@@ -1100,9 +1181,9 @@ function Home() {
                   {filteredBooks.map((book) => (
                     <article className="book-card" key={book.id}>
                       <div className="book-cover">
-                        {book.capa && (
+                        {(book.capa_url || book.capa) && (
                           <img
-                            src={book.capa}
+                            src={book.capa_url || book.capa}
                             alt={`Capa de ${book.titulo}`}
                           />
                         )}
@@ -1337,18 +1418,62 @@ function Home() {
                   </div>
 
                   <div className="book-form-field full">
-                    <label htmlFor="capa">Caminho ou endereço da capa</label>
+                    <label htmlFor="capa">Endereço da capa</label>
 
                     <input
                       id="capa"
                       name="capa"
                       type="text"
                       maxLength="200"
-                      placeholder="Ex.: imagens/livro.jpg"
+                      placeholder="Endereço externo ou fornecido pela Open Library"
                       value={formLivro.capa}
                       onChange={atualizarCampo}
-                      required
                     />
+
+                    <small>
+                      Você pode manter a capa da Open Library ou selecionar
+                      uma imagem do computador abaixo.
+                    </small>
+                  </div>
+
+                  {capaAtualUrl && !arquivoCapa && (
+                    <div className="book-cover-preview full">
+                      <span>CAPA ATUAL</span>
+                      <img src={capaAtualUrl} alt="Capa atual do livro" />
+                    </div>
+                  )}
+
+                  <div className="book-form-field full">
+                    <label htmlFor="arquivo_capa">Enviar imagem da capa</label>
+
+                    <div className="book-file-input">
+                      <input
+                        id="arquivo_capa"
+                        name="arquivo_capa"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={selecionarArquivoCapa}
+                      />
+
+                      <ImagePlus size={19} />
+                    </div>
+
+                    {arquivoCapa ? (
+                      <small className="isbn-search-success">
+                        Imagem selecionada: {arquivoCapa.name}
+                      </small>
+                    ) : (
+                      <small>
+                        Formatos aceitos: JPG, JPEG, PNG e WEBP. Tamanho máximo
+                        de 2 MB.
+                      </small>
+                    )}
+
+                    {arquivoCapa && (
+                      <small>
+                        A nova imagem substituirá a capa atual ao salvar.
+                      </small>
+                    )}
                   </div>
 
                   <div className="book-form-field full">

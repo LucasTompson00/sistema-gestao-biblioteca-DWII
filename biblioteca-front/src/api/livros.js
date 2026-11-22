@@ -16,6 +16,16 @@ export async function cadastrarLivro(dados) {
 }
 
 export async function atualizarLivro(id, dados) {
+    const ehFormData =
+        typeof FormData !== "undefined" && dados instanceof FormData;
+
+    if (ehFormData) {
+        dados.set("_method", "PUT");
+
+        const { data } = await api.post(`/livros/${id}`, dados);
+        return data;
+    }
+
     const { data } = await api.put(`/livros/${id}`, dados);
     return data;
 }

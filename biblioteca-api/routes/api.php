@@ -22,6 +22,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::middleware('perfil:usuario,bibliotecario')->group(function () {
+            Route::get(
+                '/livros/{livro}/capa/download',
+                [LivroController::class, 'downloadCapa']
+            );
 
             Route::apiResource('livros', LivroController::class)
                 ->only(['index', 'show']);
