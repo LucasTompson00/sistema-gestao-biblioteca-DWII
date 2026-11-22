@@ -15,7 +15,7 @@ class StoreExemplarRequest extends FormRequest
     {
         return [
             'livro_id' => ['required', 'exists:livros,id'],
-            'codigo' => ['required', 'string', 'max:50'],
+            'codigo' => ['required', 'string', 'max:50', 'unique:exemplares,codigo'],
         ];
     }
 
@@ -27,6 +27,7 @@ class StoreExemplarRequest extends FormRequest
             'codigo.required' => 'O código do exemplar é obrigatório.',
             'codigo.string' => 'O código deve ser um texto.',
             'codigo.max' => 'O código deve ter no máximo 50 caracteres.',
+            'codigo.unique' => 'Já existe um exemplar com este código.',
         ];
     }
 }

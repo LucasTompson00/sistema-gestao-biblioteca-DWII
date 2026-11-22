@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exemplar;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreExemplarRequest;
+use App\Http\Requests\UpdateExemplarRequest;
 
 class ExemplarController extends Controller
 {
@@ -14,15 +15,14 @@ class ExemplarController extends Controller
         return response()->json($exemplares);
     }
 
-    public function store(Request $request)
+    public function store(StoreExemplarRequest $request)
     {
-        $dados = $request->validate([
-            'livro_id' => 'required|exists:livros,id',
-            'codigo' => 'required|string|max:50',
-            'status' => 'required|string|max:20',
-        ]);
+        $dados = $request->validated();
+
+        $dados['status'] = 'disponivel';
 
         $exemplar = Exemplar::create($dados);
+        $exemplar->load('livro');
 
         return response()->json($exemplar, 201);
     }
@@ -34,21 +34,31 @@ class ExemplarController extends Controller
         return response()->json($exemplar);
     }
 
-    public function update(Request $request, Exemplar $exemplar)
+    public function update(UpdateExemplarRequest $request, Exemplar $exemplar)
     {
-        $dados = $request->validate([
-            'livro_id' => 'sometimes|required|exists:livros,id',
-            'codigo' => 'sometimes|required|string|max:50',
-            'status' => 'sometimes|required|string|max:20',
-        ]);
+        if ($exemplar->status !== 'disponivel') {
+            return response()->json([
+                'message' => 'Não é possível alterar um exemplar que está emprestado.'
+            ], 409);
+        }
+
+        $dados = $request->validated();
 
         $exemplar->update($dados);
+        $exemplar->load('livro');
 
         return response()->json($exemplar);
     }
 
+
     public function destroy(Exemplar $exemplar)
     {
+        if ($exemplar->status !== 'disponivel' || $exemplar->emprestimos()->exists()) {
+            return response()->json([
+                'message' => 'Não é possível excluir um exemplar que possui empréstimos associados ou está emprestado.'
+            ], 409);
+        }
+
         $exemplar->delete();
 
         return response()->noContent();
