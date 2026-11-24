@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import api from "../api/client";
+import api, { inicializarCsrf } from "../api/client";
 import { AuthContext } from "./AuthContext.js";
 
 export function AuthProvider({ children }) {
@@ -8,35 +7,41 @@ export function AuthProvider({ children }) {
     const [carregando, setCarregando] = useState(true);
 
     useEffect(() => {
+        let ativo = true;
+
         async function verificarUsuario() {
-            const token = localStorage.getItem("token");
-
-            if (!token) {
-                setCarregando(false);
-                return;
-            }
-
             try {
                 const { data } = await api.get("/me");
-                setUsuario(data.usuario);
+
+                if (ativo) {
+                    setUsuario(data.usuario);
+                }
             } catch {
-                localStorage.removeItem("token");
-                setUsuario(null);
+                if (ativo) {
+                    setUsuario(null);
+                }
             } finally {
-                setCarregando(false);
+                if (ativo) {
+                    setCarregando(false);
+                }
             }
         }
 
         verificarUsuario();
+
+        return () => {
+            ativo = false;
+        };
     }, []);
 
     async function login(email, password) {
+        await inicializarCsrf();
+
         const { data } = await api.post("/login", {
             email,
             password,
         });
 
-        localStorage.setItem("token", data.token);
         setUsuario(data.usuario);
     }
 
@@ -51,10 +56,7 @@ export function AuthProvider({ children }) {
     async function logout() {
         try {
             await api.post("/logout");
-        } catch (error) {
-            console.error("Erro ao encerrar sessão:", error);
         } finally {
-            localStorage.removeItem("token");
             setUsuario(null);
         }
     }

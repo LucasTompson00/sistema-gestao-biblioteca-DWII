@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
@@ -20,22 +20,23 @@ class AuthController extends Controller
             'password.required' => 'A senha é obrigatória.',
         ]);
 
-        $usuario = Usuario::where('email', $dados['email'])
-            ->where('ativo', true)
-            ->first();
+        $credenciais = [
+            'email' => $dados['email'],
+            'password' => $dados['password'],
+            'ativo' => true,
+        ];
 
-        if (!$usuario || !Hash::check($dados['password'], $usuario->senha)) {
+        if (!Auth::guard('web')->attempt($credenciais)) {
             return response()->json([
-                'message' => 'E-mail ou senha inválidos.'
+                'message' => 'E-mail ou senha inválidos.',
             ], 401);
         }
 
-        $token = $usuario->createToken('auth_token')->plainTextToken;
+        $request->session()->regenerate();
 
         return response()->json([
             'message' => 'Login realizado com sucesso.',
-            'token' => $token,
-            'usuario' => $usuario,
+            'usuario' => Auth::guard('web')->user(),
         ]);
     }
 
@@ -77,7 +78,6 @@ class AuthController extends Controller
         ]);
     }
 
-
     public function updateMe(Request $request)
     {
         $usuario = $request->user();
@@ -107,13 +107,15 @@ class AuthController extends Controller
         ]);
     }
 
-
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Logout realizado com sucesso.'
+            'message' => 'Logout realizado com sucesso.',
         ]);
     }
 }

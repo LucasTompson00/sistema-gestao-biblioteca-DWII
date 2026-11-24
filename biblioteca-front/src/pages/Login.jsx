@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/client";
+import api, { inicializarCsrf } from "../api/client";
 import { useAuth } from "../context/useAuth";
 import "./Login.css";
 
@@ -26,6 +26,8 @@ function Login() {
   }
 
   async function handleRegister() {
+    await inicializarCsrf();
+
     const { data } = await api.post("/register", {
       nome: name,
       email,
